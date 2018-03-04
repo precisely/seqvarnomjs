@@ -1,5 +1,5 @@
 var elements = require('./elements');
-
+var constants = require('./constants');
 ometa HGVS {
   // This file describes an OMeta grammar for a subset of the HGVS
   // variant specification.  The subset is limited to is limited to those
@@ -19,13 +19,29 @@ ometa HGVS {
 
   hgvs_variant = g_variant | m_variant | c_variant | n_variant  | r_variant | p_variant,
 
-  c_variant = accn:ac ':' 'c':type '.' c_posedit:posedit -> elements.SequenceVariant({ac:ac, type:type, posedit:posedit}),
-  g_variant = accn:ac ':' 'g':type '.' g_posedit:posedit -> elements.SequenceVariant({ac:ac, type:type, posedit:posedit}),
-  m_variant = accn:ac ':' 'm':type '.' m_posedit:posedit -> elements.SequenceVariant({ac:ac, type:type, posedit:posedit}),
-  n_variant = accn:ac ':' 'n':type '.' n_posedit:posedit -> elements.SequenceVariant({ac:ac, type:type, posedit:posedit}),
-  p_variant = accn:ac ':' 'p':type '.' p_posedit:posedit -> elements.SequenceVariant({ac:ac, type:type, posedit:posedit}),
-  r_variant = accn:ac ':' 'r':type '.' r_posedit:posedit -> elements.SequenceVariant({ac:ac, type:type, posedit:posedit}),
+  c_variant = accn:ac ':' 'c':type '.' (c_phased_alleles | c_trans_alleles | c_allele | c_posedit):variant
+              -> elements.SequenceVariant({ac:ac, type:type, variant:variant}),
+  g_variant = accn:ac ':' 'g':type '.' (g_phased_alleles | g_trans_alleles | g_allele | g_posedit):variant
+              -> elements.SequenceVariant({ac:ac, type:type, variant:variant}),
+  m_variant = accn:ac ':' 'm':type '.' m_posedit:variant -> elements.SequenceVariant({ac:ac, type:type, variant:variant}),
+  n_variant = accn:ac ':' 'n':type '.' n_posedit:variant -> elements.SequenceVariant({ac:ac, type:type, variant:variant}),
+  p_variant = accn:ac ':' 'p':type '.' p_posedit:variant -> elements.SequenceVariant({ac:ac, type:type, variant:variant}),
+  r_variant = accn:ac ':' 'r':type '.' r_posedit:variant -> elements.SequenceVariant({ac:ac, type:type, variant:variant}),
 
+  ////////////////////////////////////////////////////////////////////////////
+  // HGVS Edit (without accession); e.g., c.76+3A>T
+  // This family of rules exists primarily to aid parsing variants from
+  // sources that use non-standard syntax. For example, some LOVD
+  // installations provide variants like c.222A>T.
+
+  c_typed_posedit = 'c':type '.' <c_phased_alleles | c_trans_alleles | c_allele | c_posedit>:variant
+                    -> elements.SequenceVariant({ac:null, type:type, variant:variant}),
+  g_typed_posedit = 'g':type '.' <g_phased_alleles | g_trans_alleles | g_allele | g_posedit>:variant
+                    -> elements.SequenceVariant({ac:ac, type:type, variant:variant}),
+  m_typed_posedit = 'm':type '.' m_posedit:variant -> elements.SequenceVariant({ac:null, type:type, variant:variant}),
+  n_typed_posedit = 'n':type '.' n_posedit:variant -> elements.SequenceVariant({ac:null, type:type, variant:variant}),
+  p_typed_posedit = 'p':type '.' p_posedit:variant -> elements.SequenceVariant({ac:null, type:type, variant:variant}),
+  r_typed_posedit = 'r':type '.' r_posedit:variant -> elements.SequenceVariant({ac:null, type:type, variant:variant}),
 
   ////////////////////////////////////////////////////////////////////////////
   // HGVS Position -- e.g., NM_01234.5:c.22+6 (without an edit)
@@ -40,20 +56,41 @@ ometa HGVS {
   p_hgvs_position = accn:ac ':' 'p':type '.' p_interval:pos -> elements.HGVSPosition({ac:ac, type:type, pos:post}),
   r_hgvs_position = accn:ac ':' 'r':type '.' r_interval:pos -> elements.HGVSPosition({ac:ac, type:type, pos:post}),
 
+  ////////////////////////////////////////////////////////////////////////////
+  // Allele - [edit;edit;edit] edits are in cis
+
+  c_posedit_list = (c_posedit:edit -> [edit]) |
+                   (c_posedit_list:list ';' c_posedit:edit -> list+[edit]),
+  g_posedit_list = (g_posedit:edit -> [edit]) |
+                   (g_posedit_list:list ';' g_posedit:edit -> list+[edit]),
+  c_allele = '[' c_posedit_list:edits ']' -> elements.Allele({edits:edits}),
+  g_allele = '[' g_posedit_list:edits ']' -> elements.Allele({edits:edits}),
 
   ////////////////////////////////////////////////////////////////////////////
-  // HGVS Edit (without accession); e.g., c.76+3A>T
-  // This family of rules exists primarily to aid parsing variants from
-  // sources that use non-standard syntax. For example, some LOVD
-  // installations provide variants like c.222A>T.
+  // Transalleles - allele;allele;allele... edits are in trans
 
-  c_typed_posedit = 'c':type '.' c_posedit:posedit -> elements.SequenceVariant({ac:null, type:type, posedit:posedit}),
-  g_typed_posedit = 'g':type '.' g_posedit:posedit -> elements.SequenceVariant({ac:null, type:type, posedit:posedit}),
-  m_typed_posedit = 'm':type '.' m_posedit:posedit -> elements.SequenceVariant({ac:null, type:type, posedit:posedit}),
-  n_typed_posedit = 'n':type '.' n_posedit:posedit -> elements.SequenceVariant({ac:null, type:type, posedit:posedit}),
-  p_typed_posedit = 'p':type '.' p_posedit:posedit -> elements.SequenceVariant({ac:null, type:type, posedit:posedit}),
-  r_typed_posedit = 'r':type '.' r_posedit:posedit -> elements.SequenceVariant({ac:null, type:type, posedit:posedit}),
+  c_trans_alleles = c_allele:allele1 ';'
+                   (c_allele:allele2 -> elements.TransAlleles({alleles:[allele1,allele2]}))
+                 | (c_trans_alleles:trans_alleles -> trans_alleles.alleles.push(allele1)),
+  g_trans_alleles = g_allele:allele1 ';'
+                   (g_allele:allele2 -> elements.TransAlleles({alleles:[allele1,allele2]}))
+                 | (g_trans_alleles:trans_alleles -> trans_alleles.alleles.push(allele1)),
 
+  ////////////////////////////////////////////////////////////////////////////
+  // PhasedAlleles - trans or cis alleles
+
+  c_phased_alleles = c_trans_alleles | c_allele,
+  g_phased_alleles = g_trans_alleles | g_allele,
+
+  ////////////////////////////////////////////////////////////////////////////
+  // UnphasedAlleles - phased(;)phased(;)phased...
+
+  c_unphased_alleles = c_phased_alleles:allele1 '(;)'
+                      (c_phased_alleles:allele2 -> elements.UnphasedAlleles({alleles:[allele1,allele2]}))
+                    | (c_unphased_alleles:unphased -> unphased.alleles.push(allele1)),
+  c_unphased_alleles = g_phased_alleles:allele1 '(;)'
+                      (g_phased_alleles:allele2 -> elements.UnphasedAlleles({alleles:[allele1,allele2]}))
+                    | (g_unphased_alleles:unphased -> unphased.alleles.push(allele1)),
 
   ////////////////////////////////////////////////////////////////////////////
   // PosEdits -- position + edit objects
@@ -148,13 +185,13 @@ ometa HGVS {
   r_pos = def_r_pos | '(' def_r_pos:pos ')' -> pos.setUncertain(),
 
   // definite positions
-  def_c_pos = base:b offset:o -> elements.BaseOffsetPosition({base:b,offset:o,datum:hgvs.enums.Datum.CDS_START})
-        | '*' num:b offset:o -> elements.BaseOffsetPosition({base:b,offset:o,datum:hgvs.enums.Datum.CDS_END}),
+  def_c_pos = base:b offset:o -> elements.BaseOffsetPosition({base:b,offset:o,datum:constants.CDS_START})
+        | '*' num:b offset:o -> elements.BaseOffsetPosition({base:b,offset:o,datum:constants.CDS_END}),
   def_g_pos = (num|'?'->null):pos -> elements.SimplePosition(pos),
   def_m_pos = (num|'?'->null):pos -> elements.SimplePosition(pos),
-  def_n_pos = base:b offset:o -> elements.BaseOffsetPosition({base:b,offset:o,datum:hgvs.enums.Datum.SEQ_START}),
+  def_n_pos = base:b offset:o -> elements.BaseOffsetPosition({base:b,offset:o,datum:constants.SEQ_START}),
   def_p_pos = (term13|aa13):aa num:pos -> elements.AAPosition({base:pos,aa:aa_to_aa1(aa)}),
-  def_r_pos = base:b offset:o -> elements.BaseOffsetPosition({base:b,offset:o,datum:hgvs.enums.Datum.SEQ_START}),
+  def_r_pos = base:b offset:o -> elements.BaseOffsetPosition({base:b,offset:o,datum:constants.SEQ_START}),
 
 
   ////////////////////////////////////////////////////////////////////////////
