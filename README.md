@@ -2,4 +2,5 @@
 
 # SEQVARNOMJS
 
-A node parser for Human Genome Variation Society's [Sequence Variant Nomenclature](http://varnomen.hgvs.org/ ).
+Javascript parser for [Sequence Variant Nomenclature](http://varnomen.hgvs.org/ ).
+
