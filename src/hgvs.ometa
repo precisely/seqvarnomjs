@@ -19,9 +19,9 @@ ometa HGVS {
 
   hgvs_variant = g_variant | m_variant | c_variant | n_variant  | r_variant | p_variant,
 
-  c_variant = accn:ac ':' 'c':type '.' (c_phased_alleles | c_trans_alleles | c_allele | c_posedit):variant
+  c_variant = accn:ac ':' 'c':type '.' (c_unphased_alleles | c_trans_alleles | c_allele | c_posedit):variant
               -> new elements.SequenceVariant({ac:ac, type:type, variant:variant}),
-  g_variant = accn:ac ':' 'g':type '.' (g_phased_alleles | g_trans_alleles | g_allele | g_posedit):variant
+  g_variant = accn:ac ':' 'g':type '.' (g_unphased_alleles | g_trans_alleles | g_allele | g_posedit):variant
               -> new elements.SequenceVariant({ac:ac, type:type, variant:variant}),
   m_variant = accn:ac ':' 'm':type '.' m_posedit:variant -> new elements.SequenceVariant({ac:ac, type:type, variant:variant}),
   n_variant = accn:ac ':' 'n':type '.' n_posedit:variant -> new elements.SequenceVariant({ac:ac, type:type, variant:variant}),
@@ -34,9 +34,9 @@ ometa HGVS {
   // sources that use non-standard syntax. For example, some LOVD
   // installations provide variants like c.222A>T.
 
-  c_typed_posedit = 'c':type '.' <c_phased_alleles | c_trans_alleles | c_allele | c_posedit>:variant
+  c_typed_posedit = 'c':type '.' (c_unphased_alleles | c_trans_alleles | c_allele | c_posedit):variant
                     -> new elements.SequenceVariant({ac:null, type:type, variant:variant}),
-  g_typed_posedit = 'g':type '.' <g_phased_alleles | g_trans_alleles | g_allele | g_posedit>:variant
+  g_typed_posedit = 'g':type '.' (g_unphased_alleles | g_trans_alleles | g_allele | g_posedit):variant
                     -> new elements.SequenceVariant({ac:ac, type:type, variant:variant}),
   m_typed_posedit = 'm':type '.' m_posedit:variant -> new elements.SequenceVariant({ac:null, type:type, variant:variant}),
   n_typed_posedit = 'n':type '.' n_posedit:variant -> new elements.SequenceVariant({ac:null, type:type, variant:variant}),
@@ -59,22 +59,18 @@ ometa HGVS {
   ////////////////////////////////////////////////////////////////////////////
   // Allele - [edit;edit;edit] edits are in cis
 
-  c_posedit_list = (c_posedit:edit -> [edit]) |
-                   (c_posedit_list:list ';' c_posedit:edit -> list+[edit]),
-  g_posedit_list = (g_posedit:edit -> [edit]) |
-                   (g_posedit_list:list ';' g_posedit:edit -> list+[edit]),
-  c_allele = '[' c_posedit_list:edits ']' -> new elements.Allele({edits:edits}),
-  g_allele = '[' g_posedit_list:edits ']' -> new elements.Allele({edits:edits}),
+  //c_posedit_list = (c_posedit:edit -> [edit]) |
+  //                 (c_posedit_list:list ';' c_posedit:edit -> list+[edit]),
+  //g_posedit_list = (g_posedit:edit -> [edit]) |
+  //                 (g_posedit_list:list ';' g_posedit:edit -> list+[edit]),
+  c_allele = '[' listOf(#c_posedit,';'):edits ?(edits.length>0) ']' -> new elements.Allele({edits:edits}),
+  g_allele = '[' listOf(#g_posedit,';'):edits ?(edits.length>0) ']' -> new elements.Allele({edits:edits}),
 
   ////////////////////////////////////////////////////////////////////////////
   // Transalleles - allele;allele;allele... edits are in trans
 
-  c_trans_alleles = c_allele:allele1 ';'
-                   (c_allele:allele2 -> new elements.TransAlleles({alleles:[allele1,allele2]}))
-                 | (c_trans_alleles:trans_alleles -> trans_alleles.alleles.unshift(allele1)),
-  g_trans_alleles = g_allele:allele1 ';'
-                   (g_allele:allele2 -> new elements.TransAlleles({alleles:[allele1,allele2]}))
-                 | (g_trans_alleles:trans_alleles -> trans_alleles.alleles.unshift("123")),
+  c_trans_alleles = listOf(#c_allele, ';'):alleles ?(alleles.length>1) -> new elements.TransAlleles({alleles:alleles})),
+  g_trans_alleles = listOf(#g_allele, ';'):alleles ?(alleles.length>1) -> new elements.TransAlleles({alleles:alleles}),
 
   ////////////////////////////////////////////////////////////////////////////
   // PhasedAlleles - trans or cis alleles
@@ -85,12 +81,8 @@ ometa HGVS {
   ////////////////////////////////////////////////////////////////////////////
   // UnphasedAlleles - phased(;)phased(;)phased...
 
-  c_unphased_alleles = c_phased_alleles:allele1 '(;)'
-                      (c_phased_alleles:allele2 -> new elements.UnphasedAlleles({alleles:[allele1,allele2]}))
-                    | (c_unphased_alleles:unphased -> unphased.alleles.push(allele1)),
-  c_unphased_alleles = g_phased_alleles:allele1 '(;)'
-                      (g_phased_alleles:allele2 -> new elements.UnphasedAlleles({alleles:[allele1,allele2]}))
-                    | (g_unphased_alleles:unphased -> unphased.alleles.push(allele1)),
+  c_unphased_alleles = listOf(#c_phased_alleles, '(;)'):alleles ?(alleles.length>1) -> new elements.UnphasedAlleles({alleles:alleles}),
+  g_unphased_alleles = listOf(#g_phased_alleles, '(;)'):alleles ?(alleles.length>1) -> new elements.UnphasedAlleles({alleles:alleles}),
 
   ////////////////////////////////////////////////////////////////////////////
   // PosEdits -- position + edit objects
