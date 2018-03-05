@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "test": "yarn build && jest",
-    "build": "ometajs2js -b -i src/svn.ometa -o src/svn.js",
+    "build": "rm src/svn.js && ometajs2js -b -i src/svn.ometa -o src/svn.js",
     "lint": "eslint src/**/*.js test/**/*.js"
   },
   "author": "",
