@@ -57,26 +57,29 @@ ometa SVN {
   rHgvsPosition = accn:ac ':' 'r':type '.' rInterval:pos -> new elements.HGVSPosition({ac:ac, type:type, pos:post}),
 
   ////////////////////////////////////////////////////////////////////////////
-  // Allele - [edit;edit;edit] edits are in cis
+  // UnphasedVariant - phased(;)phased(;)phased...
+  cUnphasedVariant = listOf(#cPhasedVariants, '(;)'):phasedVariants ?(phasedVariants.length>1) -> new elements.UnphasedVariant({variants:phasedVariants}),
+  gUnphasedVariant = listOf(#gPhasedVariants, '(;)'):phasedVariants ?(phasedVariants.length>1) -> new elements.UnphasedVariant({variants:phasedVariants}),
 
-  //cSimpleVariantList = (cSimpleVariant:edit -> [edit]) |
-  //                 (cSimpleVariantList:list ';' cSimpleVariant:edit -> list+[edit]),
-  //gSimpleVariantList = (gSimpleVariant:edit -> [edit]) |
-  //                 (gSimpleVariantList:list ';' gSimpleVariant:edit -> list+[edit]),
-  cCisVariant = '[' listOf(#cSimpleVariant,';'):edits ?(edits.length>0) ']' -> new elements.CisVariant({variants:edits}),
-  gCisVariant = '[' listOf(#gSimpleVariant,';'):edits ?(edits.length>0) ']' -> new elements.CisVariant({variants:edits}),
+
+  ////////////////////////////////////////////////////////////////////////////
+  // PhasedAlleles - trans or cis cisVariants
+  cPhasedVariants = cTransVariant | cCisVariant,
+  gPhasedVariants = gTransVariant | gCisVariant,
 
   ////////////////////////////////////////////////////////////////////////////
   // TransVariant - cisVariant;cisVariant;cisVariant... edits are in trans
-
   cTransVariant = listOf(#cCisVariant, ';'):cisVariants ?(cisVariants.length>1) -> new elements.TransVariant({variants:cisVariants})),
   gTransVariant = listOf(#gCisVariant, ';'):cisVariants ?(cisVariants.length>1) -> new elements.TransVariant({variants:cisVariants}),
 
   ////////////////////////////////////////////////////////////////////////////
-  // PhasedAlleles - trans or cis cisVariants
+  // CisVariant (aka alleles) - [edit;edit;edit] edits are in cis
+  cisBracketPattern :elt =
+      ('[' listOf(elt,';'):edits ?(edits.length===1) ']' -> edits[0])
+    | ('[' listOf(elt,';'):edits ?(edits.length>1) ']' -> new elements.CisVariant({variants:edits})),
 
-  cPhasedVariants = cTransVariant | cCisVariant,
-  gPhasedVariants = gTransVariant | gCisVariant,
+  cCisVariant = cisBracketPattern(#cSimpleVariant),
+  gCisVariant = cisBracketPattern(#gSimpleVariant),
 
   ////////////////////////////////////////////////////////////////////////////
   // UnphasedVariant - phased(;)phased(;)phased...
