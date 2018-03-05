@@ -17,16 +17,16 @@ ometa HGVS {
   ////////////////////////////////////////////////////////////////////////////
   // HGVS Sequence Variant
 
-  hgvs_variant = g_variant | m_variant | c_variant | n_variant  | r_variant | p_variant,
+  hgvs_variant = g_seq_variant | m_seq_variant | c_seq_variant | n_seq_variant  | r_seq_variant | p_seq_variant,
 
-  c_variant = accn:ac ':' 'c':type '.' (c_unphased_alleles | c_trans_alleles | c_allele | c_posedit):variant
+  c_seq_variant = accn:ac ':' 'c':type '.' (c_unphased_variant | c_trans_variant | c_cis_variant | c_simple_variant):variant
               -> new elements.SequenceVariant({ac:ac, type:type, variant:variant}),
-  g_variant = accn:ac ':' 'g':type '.' (g_unphased_alleles | g_trans_alleles | g_allele | g_posedit):variant
+  g_seq_variant = accn:ac ':' 'g':type '.' (g_unphased_variant | g_trans_variant | g_cis_variant | g_simple_variant):variant
               -> new elements.SequenceVariant({ac:ac, type:type, variant:variant}),
-  m_variant = accn:ac ':' 'm':type '.' m_posedit:variant -> new elements.SequenceVariant({ac:ac, type:type, variant:variant}),
-  n_variant = accn:ac ':' 'n':type '.' n_posedit:variant -> new elements.SequenceVariant({ac:ac, type:type, variant:variant}),
-  p_variant = accn:ac ':' 'p':type '.' p_posedit:variant -> new elements.SequenceVariant({ac:ac, type:type, variant:variant}),
-  r_variant = accn:ac ':' 'r':type '.' r_posedit:variant -> new elements.SequenceVariant({ac:ac, type:type, variant:variant}),
+  m_seq_variant = accn:ac ':' 'm':type '.' m_simple_variant:variant -> new elements.SequenceVariant({ac:ac, type:type, variant:variant}),
+  n_seq_variant = accn:ac ':' 'n':type '.' n_simple_variant:variant -> new elements.SequenceVariant({ac:ac, type:type, variant:variant}),
+  p_seq_variant = accn:ac ':' 'p':type '.' p_simple_variant:variant -> new elements.SequenceVariant({ac:ac, type:type, variant:variant}),
+  r_seq_variant = accn:ac ':' 'r':type '.' r_simple_variant:variant -> new elements.SequenceVariant({ac:ac, type:type, variant:variant}),
 
   ////////////////////////////////////////////////////////////////////////////
   // HGVS Edit (without accession); e.g., c.76+3A>T
@@ -34,14 +34,14 @@ ometa HGVS {
   // sources that use non-standard syntax. For example, some LOVD
   // installations provide variants like c.222A>T.
 
-  c_typed_posedit = 'c':type '.' (c_unphased_alleles | c_trans_alleles | c_allele | c_posedit):variant
+  c_typed_simple_variant = 'c':type '.' (c_unphased_variant | c_trans_variant | c_cis_variant | c_simple_variant):variant
                     -> new elements.SequenceVariant({ac:null, type:type, variant:variant}),
-  g_typed_posedit = 'g':type '.' (g_unphased_alleles | g_trans_alleles | g_allele | g_posedit):variant
+  g_typed_simple_variant = 'g':type '.' (g_unphased_variant | g_trans_variant | g_cis_variant | g_simple_variant):variant
                     -> new elements.SequenceVariant({ac:ac, type:type, variant:variant}),
-  m_typed_posedit = 'm':type '.' m_posedit:variant -> new elements.SequenceVariant({ac:null, type:type, variant:variant}),
-  n_typed_posedit = 'n':type '.' n_posedit:variant -> new elements.SequenceVariant({ac:null, type:type, variant:variant}),
-  p_typed_posedit = 'p':type '.' p_posedit:variant -> new elements.SequenceVariant({ac:null, type:type, variant:variant}),
-  r_typed_posedit = 'r':type '.' r_posedit:variant -> new elements.SequenceVariant({ac:null, type:type, variant:variant}),
+  m_typed_simple_variant = 'm':type '.' m_simple_variant:variant -> new elements.SequenceVariant({ac:null, type:type, variant:variant}),
+  n_typed_simple_variant = 'n':type '.' n_simple_variant:variant -> new elements.SequenceVariant({ac:null, type:type, variant:variant}),
+  p_typed_simple_variant = 'p':type '.' p_simple_variant:variant -> new elements.SequenceVariant({ac:null, type:type, variant:variant}),
+  r_typed_simple_variant = 'r':type '.' r_simple_variant:variant -> new elements.SequenceVariant({ac:null, type:type, variant:variant}),
 
   ////////////////////////////////////////////////////////////////////////////
   // HGVS Position -- e.g., NM_01234.5:c.22+6 (without an edit)
@@ -59,49 +59,49 @@ ometa HGVS {
   ////////////////////////////////////////////////////////////////////////////
   // Allele - [edit;edit;edit] edits are in cis
 
-  //c_posedit_list = (c_posedit:edit -> [edit]) |
-  //                 (c_posedit_list:list ';' c_posedit:edit -> list+[edit]),
-  //g_posedit_list = (g_posedit:edit -> [edit]) |
-  //                 (g_posedit_list:list ';' g_posedit:edit -> list+[edit]),
-  c_allele = '[' listOf(#c_posedit,';'):edits ?(edits.length>0) ']' -> new elements.Allele({edits:edits}),
-  g_allele = '[' listOf(#g_posedit,';'):edits ?(edits.length>0) ']' -> new elements.Allele({edits:edits}),
+  //c_simple_variant_list = (c_simple_variant:edit -> [edit]) |
+  //                 (c_simple_variant_list:list ';' c_simple_variant:edit -> list+[edit]),
+  //g_simple_variant_list = (g_simple_variant:edit -> [edit]) |
+  //                 (g_simple_variant_list:list ';' g_simple_variant:edit -> list+[edit]),
+  c_cis_variant = '[' listOf(#c_simple_variant,';'):edits ?(edits.length>0) ']' -> new elements.CisVariant({variants:edits}),
+  g_cis_variant = '[' listOf(#g_simple_variant,';'):edits ?(edits.length>0) ']' -> new elements.CisVariant({variants:edits}),
 
   ////////////////////////////////////////////////////////////////////////////
-  // Transalleles - allele;allele;allele... edits are in trans
+  // TransVariant - cis_variant;cis_variant;cis_variant... edits are in trans
 
-  c_trans_alleles = listOf(#c_allele, ';'):alleles ?(alleles.length>1) -> new elements.TransAlleles({alleles:alleles})),
-  g_trans_alleles = listOf(#g_allele, ';'):alleles ?(alleles.length>1) -> new elements.TransAlleles({alleles:alleles}),
-
-  ////////////////////////////////////////////////////////////////////////////
-  // PhasedAlleles - trans or cis alleles
-
-  c_phased_alleles = c_trans_alleles | c_allele,
-  g_phased_alleles = g_trans_alleles | g_allele,
+  c_trans_variant = listOf(#c_cis_variant, ';'):cis_variants ?(cis_variants.length>1) -> new elements.TransVariant({variants:cis_variants})),
+  g_trans_variant = listOf(#g_cis_variant, ';'):cis_variants ?(cis_variants.length>1) -> new elements.TransVariant({variants:cis_variants}),
 
   ////////////////////////////////////////////////////////////////////////////
-  // UnphasedAlleles - phased(;)phased(;)phased...
+  // PhasedAlleles - trans or cis cis_variants
 
-  c_unphased_alleles = listOf(#c_phased_alleles, '(;)'):alleles ?(alleles.length>1) -> new elements.UnphasedAlleles({alleles:alleles}),
-  g_unphased_alleles = listOf(#g_phased_alleles, '(;)'):alleles ?(alleles.length>1) -> new elements.UnphasedAlleles({alleles:alleles}),
+  c_phased_variants = c_trans_variant | c_cis_variant,
+  g_phased_variants = g_trans_variant | g_cis_variant,
+
+  ////////////////////////////////////////////////////////////////////////////
+  // UnphasedVariant - phased(;)phased(;)phased...
+
+  c_unphased_variant = listOf(#c_phased_variants, '(;)'):cis_variants ?(cis_variants.length>1) -> new elements.UnphasedVariant({variants:cis_variants}),
+  g_unphased_variant = listOf(#g_phased_variants, '(;)'):cis_variants ?(cis_variants.length>1) -> new elements.UnphasedVariant({variants:cis_variants}),
 
   ////////////////////////////////////////////////////////////////////////////
   // PosEdits -- position + edit objects
 
-  c_posedit = c_interval:pos dna_edit:edit -> new elements.PosEdit({pos:pos,edit:edit}),
-  g_posedit = g_interval:pos dna_edit:edit -> new elements.PosEdit({pos:pos,edit:edit}),
-  m_posedit = m_interval:pos dna_edit:edit -> new elements.PosEdit({pos:pos,edit:edit}),
-  n_posedit = n_interval:pos dna_edit:edit -> new elements.PosEdit({pos:pos,edit:edit}),
-  r_posedit = (r_interval:pos rna_edit:edit -> new elements.PosEdit({pos:pos,edit:edit}))
-    | ('(' r_interval:pos rna_edit:edit ')' -> new elements.PosEdit({pos:pos,edit:edit})),
+  c_simple_variant = c_interval:pos dna_edit:edit -> new elements.SimpleVariant({pos:pos,edit:edit}),
+  g_simple_variant = g_interval:pos dna_edit:edit -> new elements.SimpleVariant({pos:pos,edit:edit}),
+  m_simple_variant = m_interval:pos dna_edit:edit -> new elements.SimpleVariant({pos:pos,edit:edit}),
+  n_simple_variant = n_interval:pos dna_edit:edit -> new elements.SimpleVariant({pos:pos,edit:edit}),
+  r_simple_variant = (r_interval:pos rna_edit:edit -> new elements.SimpleVariant({pos:pos,edit:edit}))
+    | ('(' r_interval:pos rna_edit:edit ')' -> new elements.SimpleVariant({pos:pos,edit:edit})),
 
-  p_posedit   = (p_interval:pos pro_edit:edit -> new elements.PosEdit({pos:pos,edit:edit}))
-    | ('(' p_interval:pos pro_edit:edit ')' -> new elements.PosEdit({pos:pos,edit:edit}))
-    | p_posedit_special,
-  p_posedit_special =
-        '=':x -> new elements.PosEdit({pos:null, edit:x, uncertain:false})
-    | '(' '=':x ')' -> new elements.PosEdit({pos:null, edit:x, uncertain:true})
-    | '0':x '?' -> new elements.PosEdit({pos:null, edit:x, uncertain:true})
-    | '0':x -> new elements.PosEdit({pos:null, edit:x, uncertain:false})
+  p_simple_variant   = (p_interval:pos pro_edit:edit -> new elements.SimpleVariant({pos:pos,edit:edit}))
+    | ('(' p_interval:pos pro_edit:edit ')' -> new elements.SimpleVariant({pos:pos,edit:edit}))
+    | p_simple_variant_special,
+  p_simple_variant_special =
+        '=':x -> new elements.SimpleVariant({pos:null, edit:x, uncertain:false})
+    | '(' '=':x ')' -> new elements.SimpleVariant({pos:null, edit:x, uncertain:true})
+    | '0':x '?' -> new elements.SimpleVariant({pos:null, edit:x, uncertain:true})
+    | '0':x -> new elements.SimpleVariant({pos:null, edit:x, uncertain:false})
     | '?':x -> null,
 
 

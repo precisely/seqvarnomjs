@@ -58,7 +58,7 @@ export class Interval {
   }
 }
 
-export class PosEdit {
+export class SimpleVariant {
   constructor({ pos, edit, uncertain }) {
     this.pos = pos;
     this.edit = edit;
@@ -74,9 +74,9 @@ export class PosEdit {
   }
 }
 
-export class Allele {
-  constructor({ edits }) {
-    this.edits = edits;
+export class CisVariant { // aka Allele
+  constructor({ variants }) {
+    this.variants = variants;
   }
 
   get type() {
@@ -84,9 +84,9 @@ export class Allele {
   }
 }
 
-export class TransAlleles {
-  constructor({ alleles }) {
-    this.alleles = alleles;
+export class TransVariant {
+  constructor({ variants }) {
+    this.variants = variants;
   }
 
   get type() {
@@ -94,9 +94,9 @@ export class TransAlleles {
   }
 }
 
-export class UnphasedAlleles {
-  constructor({ alleles }) {
-    this.alleles = alleles;
+export class UnphasedVariant {
+  constructor({ variants }) {
+    this.variants = variants;
   }
 
   get type() {
