@@ -1,1 +1,1 @@
-module.exports = require('./hgvs');
+module.exports = require('./svn');

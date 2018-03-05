@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "test": "yarn build && jest",
-    "build": "ometajs2js -b -i src/hgvs.ometa -o src/hgvs.js",
+    "build": "ometajs2js -b -i src/svn.ometa -o src/svn.js",
     "lint": "eslint src/**/*.js test/**/*.js"
   },
   "author": "",

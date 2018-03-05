@@ -1,6 +1,6 @@
 var elements = require('./elements');
 var constants = require('./constants');
-ometa HGVS {
+ometa SVN {
   // This file describes an OMeta grammar for a subset of the HGVS
   // variant specification.  The subset is limited to is limited to those
   // rules that define sequence variants precisely.  It does not current
@@ -15,9 +15,9 @@ ometa HGVS {
 
 
   ////////////////////////////////////////////////////////////////////////////
-  // HGVS Sequence Variant
+  // HGVS Sequence Variant Nomenclature
 
-  hgvs_variant = g_seq_variant | m_seq_variant | c_seq_variant | n_seq_variant  | r_seq_variant | p_seq_variant,
+  svn_variant = g_seq_variant | m_seq_variant | c_seq_variant | n_seq_variant  | r_seq_variant | p_seq_variant,
 
   c_seq_variant = accn:ac ':' 'c':type '.' (c_unphased_variant | c_trans_variant | c_cis_variant | c_simple_variant):variant
               -> new elements.SequenceVariant({ac:ac, type:type, variant:variant}),

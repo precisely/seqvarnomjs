@@ -1,11 +1,11 @@
-import { HGVS } from 'src/hgvs';
+import { SVN } from 'src/svn';
 import { SequenceVariant, TransVariant, NARefAlt } from 'src/elements';
 import { UnphasedVariant, CisVariant, SimpleVariant } from '../src/elements';
 
-describe('HGVS', function () {
+describe('SVN', function () {
   context('#matchAll', function () {
     it('should read a simple nucleic acid variant', function () {
-      var result = HGVS.matchAll('NC00001_1.11:g.123123T>C', 'hgvs_variant');
+      var result = SVN.matchAll('NC00001_1.11:g.123123T>C', 'svn_variant');
       expect(result).toBeInstanceOf(SequenceVariant);
       expect(result.ac).toEqual('NC00001_1.11');
       expect(result.type).toEqual('g');
@@ -17,7 +17,7 @@ describe('HGVS', function () {
     });
 
     it('should read a wild-type variant', function () {
-      var result = HGVS.matchAll('NC00001_1.11:g.123123=', 'hgvs_variant');
+      var result = SVN.matchAll('NC00001_1.11:g.123123=', 'svn_variant');
       expect(result).toBeInstanceOf(SequenceVariant);
       expect(result.ac).toEqual('NC00001_1.11');
       expect(result.type).toEqual('g');
@@ -30,7 +30,7 @@ describe('HGVS', function () {
       context('when it is a heterozygous trans variant', function () {
         var result;
         beforeEach(function () {
-          result = HGVS.matchAll('NC00001_1.11:g.[123123T>C];[123123=]', 'hgvs_variant');
+          result = SVN.matchAll('NC00001_1.11:g.[123123T>C];[123123=]', 'svn_variant');
         });
 
         it('should read a heterozygous variant as a TransVariant type', function () {
@@ -60,7 +60,7 @@ describe('HGVS', function () {
       });
 
       it('should read a wild type variant as a TransAllele type', function () {
-        var result = HGVS.matchAll('NC00001_1.11:g.[123123=];[123123=]', 'hgvs_variant');
+        var result = SVN.matchAll('NC00001_1.11:g.[123123=];[123123=]', 'svn_variant');
         expect(result).toBeInstanceOf(SequenceVariant);
         expect(result.variant).toBeInstanceOf(TransVariant);
         expect(result.variant.variants).toHaveLength(2);
@@ -74,7 +74,7 @@ describe('HGVS', function () {
       });
 
       it('should read a tri-allelic variant as a TransVariant type', function () {
-        var result = HGVS.matchAll('NC00001_1.11:g.[123123T>C];[123123T>G];[123123T>A]', 'hgvs_variant');
+        var result = SVN.matchAll('NC00001_1.11:g.[123123T>C];[123123T>G];[123123T>A]', 'svn_variant');
         expect(result).toBeInstanceOf(SequenceVariant);
         expect(result.variant).toBeInstanceOf(TransVariant);
         expect(result.variant.variants).toHaveLength(3);
@@ -90,7 +90,7 @@ describe('HGVS', function () {
       });
 
       it('should read a variant with uncertain phases as an UnphasedVariant type', function () {
-        var result = HGVS.matchAll('NC00001_1.11:g.[123123T>C](;)[123123T>G](;)[123123T>A]', 'hgvs_variant');
+        var result = SVN.matchAll('NC00001_1.11:g.[123123T>C](;)[123123T>G](;)[123123T>A]', 'svn_variant');
         expect(result).toBeInstanceOf(SequenceVariant);
         expect(result.variant).toBeInstanceOf(UnphasedVariant);
         expect(result.variant.variants).toHaveLength(3);
@@ -108,7 +108,7 @@ describe('HGVS', function () {
       context('parsing complex unphased variants with both cis and trans variants, the variant', function () {
         var result;
         beforeEach(function() {
-          result = HGVS.matchAll('NC00001_1.11:g.[123123T>C;999A>G];[444C>T](;)[222T>G](;)[333T>A]', 'hgvs_variant');
+          result = SVN.matchAll('NC00001_1.11:g.[123123T>C;999A>G];[444C>T](;)[222T>G](;)[333T>A]', 'svn_variant');
         });
 
         it('should be an UnphasedVariant containing three variants', function () {
