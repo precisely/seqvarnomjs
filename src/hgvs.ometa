@@ -17,16 +17,16 @@ ometa HGVS {
   ////////////////////////////////////////////////////////////////////////////
   // HGVS Sequence Variant
 
-  hgvs_variant = g_variant | m_variant | c_variant | n_variant  | r_variant | p_variant,
+  hgvs_variant = g_seq_variant | m_seq_variant | c_seq_variant | n_seq_variant  | r_seq_variant | p_seq_variant,
 
-  c_variant = accn:ac ':' 'c':type '.' (c_phased_alleles | c_trans_alleles | c_allele | c_posedit):variant
-              -> elements.SequenceVariant({ac:ac, type:type, variant:variant}),
-  g_variant = accn:ac ':' 'g':type '.' (g_phased_alleles | g_trans_alleles | g_allele | g_posedit):variant
-              -> elements.SequenceVariant({ac:ac, type:type, variant:variant}),
-  m_variant = accn:ac ':' 'm':type '.' m_posedit:variant -> elements.SequenceVariant({ac:ac, type:type, variant:variant}),
-  n_variant = accn:ac ':' 'n':type '.' n_posedit:variant -> elements.SequenceVariant({ac:ac, type:type, variant:variant}),
-  p_variant = accn:ac ':' 'p':type '.' p_posedit:variant -> elements.SequenceVariant({ac:ac, type:type, variant:variant}),
-  r_variant = accn:ac ':' 'r':type '.' r_posedit:variant -> elements.SequenceVariant({ac:ac, type:type, variant:variant}),
+  c_seq_variant = accn:ac ':' 'c':type '.' (c_unphased_variant | c_trans_variant | c_cis_variant | c_simple_variant):variant
+              -> new elements.SequenceVariant({ac:ac, type:type, variant:variant}),
+  g_seq_variant = accn:ac ':' 'g':type '.' (g_unphased_variant | g_trans_variant | g_cis_variant | g_simple_variant):variant
+              -> new elements.SequenceVariant({ac:ac, type:type, variant:variant}),
+  m_seq_variant = accn:ac ':' 'm':type '.' m_simple_variant:variant -> new elements.SequenceVariant({ac:ac, type:type, variant:variant}),
+  n_seq_variant = accn:ac ':' 'n':type '.' n_simple_variant:variant -> new elements.SequenceVariant({ac:ac, type:type, variant:variant}),
+  p_seq_variant = accn:ac ':' 'p':type '.' p_simple_variant:variant -> new elements.SequenceVariant({ac:ac, type:type, variant:variant}),
+  r_seq_variant = accn:ac ':' 'r':type '.' r_simple_variant:variant -> new elements.SequenceVariant({ac:ac, type:type, variant:variant}),
 
   ////////////////////////////////////////////////////////////////////////////
   // HGVS Edit (without accession); e.g., c.76+3A>T
@@ -34,14 +34,14 @@ ometa HGVS {
   // sources that use non-standard syntax. For example, some LOVD
   // installations provide variants like c.222A>T.
 
-  c_typed_posedit = 'c':type '.' <c_phased_alleles | c_trans_alleles | c_allele | c_posedit>:variant
-                    -> elements.SequenceVariant({ac:null, type:type, variant:variant}),
-  g_typed_posedit = 'g':type '.' <g_phased_alleles | g_trans_alleles | g_allele | g_posedit>:variant
-                    -> elements.SequenceVariant({ac:ac, type:type, variant:variant}),
-  m_typed_posedit = 'm':type '.' m_posedit:variant -> elements.SequenceVariant({ac:null, type:type, variant:variant}),
-  n_typed_posedit = 'n':type '.' n_posedit:variant -> elements.SequenceVariant({ac:null, type:type, variant:variant}),
-  p_typed_posedit = 'p':type '.' p_posedit:variant -> elements.SequenceVariant({ac:null, type:type, variant:variant}),
-  r_typed_posedit = 'r':type '.' r_posedit:variant -> elements.SequenceVariant({ac:null, type:type, variant:variant}),
+  c_typed_simple_variant = 'c':type '.' (c_unphased_variant | c_trans_variant | c_cis_variant | c_simple_variant):variant
+                    -> new elements.SequenceVariant({ac:null, type:type, variant:variant}),
+  g_typed_simple_variant = 'g':type '.' (g_unphased_variant | g_trans_variant | g_cis_variant | g_simple_variant):variant
+                    -> new elements.SequenceVariant({ac:ac, type:type, variant:variant}),
+  m_typed_simple_variant = 'm':type '.' m_simple_variant:variant -> new elements.SequenceVariant({ac:null, type:type, variant:variant}),
+  n_typed_simple_variant = 'n':type '.' n_simple_variant:variant -> new elements.SequenceVariant({ac:null, type:type, variant:variant}),
+  p_typed_simple_variant = 'p':type '.' p_simple_variant:variant -> new elements.SequenceVariant({ac:null, type:type, variant:variant}),
+  r_typed_simple_variant = 'r':type '.' r_simple_variant:variant -> new elements.SequenceVariant({ac:null, type:type, variant:variant}),
 
   ////////////////////////////////////////////////////////////////////////////
   // HGVS Position -- e.g., NM_01234.5:c.22+6 (without an edit)
@@ -49,67 +49,59 @@ ometa HGVS {
 
   hgvs_position     = g_hgvs_position | m_hgvs_position | c_hgvs_position | n_hgvs_position | r_hgvs_position | p_hgvs_position,
 
-  c_hgvs_position = accn:ac ':' 'c':type '.' c_interval:pos -> elements.HGVSPosition({ac:ac, type:type, pos:post}),
-  g_hgvs_position = accn:ac ':' 'g':type '.' g_interval:pos -> elements.HGVSPosition({ac:ac, type:type, pos:post}),
-  m_hgvs_position = accn:ac ':' 'm':type '.' m_interval:pos -> elements.HGVSPosition({ac:ac, type:type, pos:post}),
-  n_hgvs_position = accn:ac ':' 'n':type '.' n_interval:pos -> elements.HGVSPosition({ac:ac, type:type, pos:post}),
-  p_hgvs_position = accn:ac ':' 'p':type '.' p_interval:pos -> elements.HGVSPosition({ac:ac, type:type, pos:post}),
-  r_hgvs_position = accn:ac ':' 'r':type '.' r_interval:pos -> elements.HGVSPosition({ac:ac, type:type, pos:post}),
+  c_hgvs_position = accn:ac ':' 'c':type '.' c_interval:pos -> new elements.HGVSPosition({ac:ac, type:type, pos:post}),
+  g_hgvs_position = accn:ac ':' 'g':type '.' g_interval:pos -> new elements.HGVSPosition({ac:ac, type:type, pos:post}),
+  m_hgvs_position = accn:ac ':' 'm':type '.' m_interval:pos -> new elements.HGVSPosition({ac:ac, type:type, pos:post}),
+  n_hgvs_position = accn:ac ':' 'n':type '.' n_interval:pos -> new elements.HGVSPosition({ac:ac, type:type, pos:post}),
+  p_hgvs_position = accn:ac ':' 'p':type '.' p_interval:pos -> new elements.HGVSPosition({ac:ac, type:type, pos:post}),
+  r_hgvs_position = accn:ac ':' 'r':type '.' r_interval:pos -> new elements.HGVSPosition({ac:ac, type:type, pos:post}),
 
   ////////////////////////////////////////////////////////////////////////////
   // Allele - [edit;edit;edit] edits are in cis
 
-  c_posedit_list = (c_posedit:edit -> [edit]) |
-                   (c_posedit_list:list ';' c_posedit:edit -> list+[edit]),
-  g_posedit_list = (g_posedit:edit -> [edit]) |
-                   (g_posedit_list:list ';' g_posedit:edit -> list+[edit]),
-  c_allele = '[' c_posedit_list:edits ']' -> elements.Allele({edits:edits}),
-  g_allele = '[' g_posedit_list:edits ']' -> elements.Allele({edits:edits}),
+  //c_simple_variant_list = (c_simple_variant:edit -> [edit]) |
+  //                 (c_simple_variant_list:list ';' c_simple_variant:edit -> list+[edit]),
+  //g_simple_variant_list = (g_simple_variant:edit -> [edit]) |
+  //                 (g_simple_variant_list:list ';' g_simple_variant:edit -> list+[edit]),
+  c_cis_variant = '[' listOf(#c_simple_variant,';'):edits ?(edits.length>0) ']' -> new elements.CisVariant({variants:edits}),
+  g_cis_variant = '[' listOf(#g_simple_variant,';'):edits ?(edits.length>0) ']' -> new elements.CisVariant({variants:edits}),
 
   ////////////////////////////////////////////////////////////////////////////
-  // Transalleles - allele;allele;allele... edits are in trans
+  // TransVariant - cis_variant;cis_variant;cis_variant... edits are in trans
 
-  c_trans_alleles = c_allele:allele1 ';'
-                   (c_allele:allele2 -> elements.TransAlleles({alleles:[allele1,allele2]}))
-                 | (c_trans_alleles:trans_alleles -> trans_alleles.alleles.push(allele1)),
-  g_trans_alleles = g_allele:allele1 ';'
-                   (g_allele:allele2 -> elements.TransAlleles({alleles:[allele1,allele2]}))
-                 | (g_trans_alleles:trans_alleles -> trans_alleles.alleles.push(allele1)),
+  c_trans_variant = listOf(#c_cis_variant, ';'):cis_variants ?(cis_variants.length>1) -> new elements.TransVariant({variants:cis_variants})),
+  g_trans_variant = listOf(#g_cis_variant, ';'):cis_variants ?(cis_variants.length>1) -> new elements.TransVariant({variants:cis_variants}),
 
   ////////////////////////////////////////////////////////////////////////////
-  // PhasedAlleles - trans or cis alleles
+  // PhasedAlleles - trans or cis cis_variants
 
-  c_phased_alleles = c_trans_alleles | c_allele,
-  g_phased_alleles = g_trans_alleles | g_allele,
+  c_phased_variants = c_trans_variant | c_cis_variant,
+  g_phased_variants = g_trans_variant | g_cis_variant,
 
   ////////////////////////////////////////////////////////////////////////////
-  // UnphasedAlleles - phased(;)phased(;)phased...
+  // UnphasedVariant - phased(;)phased(;)phased...
 
-  c_unphased_alleles = c_phased_alleles:allele1 '(;)'
-                      (c_phased_alleles:allele2 -> elements.UnphasedAlleles({alleles:[allele1,allele2]}))
-                    | (c_unphased_alleles:unphased -> unphased.alleles.push(allele1)),
-  c_unphased_alleles = g_phased_alleles:allele1 '(;)'
-                      (g_phased_alleles:allele2 -> elements.UnphasedAlleles({alleles:[allele1,allele2]}))
-                    | (g_unphased_alleles:unphased -> unphased.alleles.push(allele1)),
+  c_unphased_variant = listOf(#c_phased_variants, '(;)'):cis_variants ?(cis_variants.length>1) -> new elements.UnphasedVariant({variants:cis_variants}),
+  g_unphased_variant = listOf(#g_phased_variants, '(;)'):cis_variants ?(cis_variants.length>1) -> new elements.UnphasedVariant({variants:cis_variants}),
 
   ////////////////////////////////////////////////////////////////////////////
   // PosEdits -- position + edit objects
 
-  c_posedit = c_interval:pos dna_edit:edit -> elements.PosEdit({pos:pos,edit:edit}),
-  g_posedit = g_interval:pos dna_edit:edit -> elements.PosEdit({pos:pos,edit:edit}),
-  m_posedit = m_interval:pos dna_edit:edit -> elements.PosEdit({pos:pos,edit:edit}),
-  n_posedit = n_interval:pos dna_edit:edit -> elements.PosEdit({pos:pos,edit:edit}),
-  r_posedit = (r_interval:pos rna_edit:edit -> elements.PosEdit({pos:pos,edit:edit}))
-    | ('(' r_interval:pos rna_edit:edit ')' -> elements.PosEdit({pos:pos,edit:edit})),
+  c_simple_variant = c_interval:pos dna_edit:edit -> new elements.SimpleVariant({pos:pos,edit:edit}),
+  g_simple_variant = g_interval:pos dna_edit:edit -> new elements.SimpleVariant({pos:pos,edit:edit}),
+  m_simple_variant = m_interval:pos dna_edit:edit -> new elements.SimpleVariant({pos:pos,edit:edit}),
+  n_simple_variant = n_interval:pos dna_edit:edit -> new elements.SimpleVariant({pos:pos,edit:edit}),
+  r_simple_variant = (r_interval:pos rna_edit:edit -> new elements.SimpleVariant({pos:pos,edit:edit}))
+    | ('(' r_interval:pos rna_edit:edit ')' -> new elements.SimpleVariant({pos:pos,edit:edit})),
 
-  p_posedit   = (p_interval:pos pro_edit:edit -> elements.PosEdit({pos:pos,edit:edit}))
-    | ('(' p_interval:pos pro_edit:edit ')' -> elements.PosEdit({pos:pos,edit:edit}))
-    | p_posedit_special,
-  p_posedit_special =
-        '=':x -> elements.PosEdit({pos:null, edit:x, uncertain:false})
-    | '(' '=':x ')' -> elements.PosEdit({pos:null, edit:x, uncertain:true})
-    | '0':x '?' -> elements.PosEdit({pos:null, edit:x, uncertain:true})
-    | '0':x -> elements.PosEdit({pos:null, edit:x, uncertain:false})
+  p_simple_variant   = (p_interval:pos pro_edit:edit -> new elements.SimpleVariant({pos:pos,edit:edit}))
+    | ('(' p_interval:pos pro_edit:edit ')' -> new elements.SimpleVariant({pos:pos,edit:edit}))
+    | p_simple_variant_special,
+  p_simple_variant_special =
+        '=':x -> new elements.SimpleVariant({pos:null, edit:x, uncertain:false})
+    | '(' '=':x ')' -> new elements.SimpleVariant({pos:null, edit:x, uncertain:true})
+    | '0':x '?' -> new elements.SimpleVariant({pos:null, edit:x, uncertain:true})
+    | '0':x -> new elements.SimpleVariant({pos:null, edit:x, uncertain:false})
     | '?':x -> null,
 
 
@@ -122,37 +114,37 @@ ometa HGVS {
 
   dna_edit_mu = dna_edit | '(' dna_edit:edit ')' -> edit.setUncertain(),
   dna_edit   = dna_ident | dna_subst | dna_delins | dna_ins | dna_del | dna_dup | dna_inv | dna_con | dna_copy,
-  dna_ident  = <dna*>:ref '='           -> elements.NARefAlt({ref:ref,alt:ref}),
-  dna_subst  = dna:ref '>' dna:alt      -> elements.NARefAlt({ref:ref,alt:alt}),
-  dna_delins = 'del' (<num>|<dna*>):ref 'ins' <dna+>:alt  -> elements.NARefAlt({ref:ref,alt:ref}),
-  dna_del    = 'del' (<num>|<dna*>):ref -> elements.NARefAlt({ref:ref,alt:null}),
-  dna_ins    = 'ins' <dna+>:alt         -> elements.NARefAlt({ref:null,alt:ref}),
-  dna_dup    = 'dup' <dna*>:ref         -> elements.Dup({ref:ref}),
-  dna_inv    = 'inv' (<num>|<dna*>):ref -> elements.Inv({ref:null}),
-  dna_con    = 'con' hgvs_position:pos  -> elements.Conv({from_ac:pos.ac, from_type:pos.type, from_pos:pos.pos}),
-  dna_copy   = 'copy' num:n -> elements.NACopy({copy:n}),
+  dna_ident  = <dna*>:ref '='           -> null,
+  dna_subst  = dna:ref '>' dna:alt      -> new elements.NARefAlt({ref:ref,alt:alt}),
+  dna_delins = 'del' (<num>|<dna*>):ref 'ins' <dna+>:alt  -> null,
+  dna_del    = 'del' (<num>|<dna*>):ref -> new elements.NARefAlt({ref:ref,alt:null}),
+  dna_ins    = 'ins' <dna+>:alt         -> new elements.NARefAlt({ref:null,alt:ref}),
+  dna_dup    = 'dup' <dna*>:ref         -> new elements.Dup({ref:ref}),
+  dna_inv    = 'inv' (<num>|<dna*>):ref -> new elements.Inv({ref:null}),
+  dna_con    = 'con' hgvs_position:pos  -> new elements.Conv({from_ac:pos.ac, from_type:pos.type, from_pos:pos.pos}),
+  dna_copy   = 'copy' num:n -> new elements.NACopy({copy:n}),
 
   rna_edit_mu = rna_edit | '(' rna_edit:edit ')' -> edit.setUncertain(),
   rna_edit   = rna_ident | rna_subst | rna_delins | rna_ins | rna_del | rna_dup | rna_inv | rna_con,
-  rna_ident  = <rna*>:ref '='                  -> elements.NARefAlt({ref:ref,alt:ref}),
-  rna_subst  = rna:ref '>' rna:alt             -> elements.NARefAlt({ref:ref,alt:alt}),
-  rna_delins = 'del' (<num>|<rna*>):ref 'ins' <rna+>:alt  -> elements.NARefAlt({ref:ref,alt:alt}),
-  rna_del    = 'del' (<num>|<rna*>):ref        -> elements.NARefAlt({ref:ref,alt:null}),
-  rna_ins    = 'ins' <rna+>:alt                -> elements.NARefAlt({ref:null,alt:alt}),
-  rna_dup    = 'dup' <rna*>:ref                -> elements.Dup({ref:ref}),
-  rna_inv    = 'inv' (<num>|<rna*>):ref        -> elements.Inv({ref:null}),
-  rna_con    = 'con' hgvs_position:pos         -> elements.Conv({from_ac:pos.ac, from_type:pos.type, from_pos:pos.pos}),
+  rna_ident  = <rna*>:ref '='                  -> new elements.NARefAlt({ref:ref,alt:ref}),
+  rna_subst  = rna:ref '>' rna:alt             -> new elements.NARefAlt({ref:ref,alt:alt}),
+  rna_delins = 'del' (<num>|<rna*>):ref 'ins' <rna+>:alt  -> new elements.NARefAlt({ref:ref,alt:alt}),
+  rna_del    = 'del' (<num>|<rna*>):ref        -> new elements.NARefAlt({ref:ref,alt:null}),
+  rna_ins    = 'ins' <rna+>:alt                -> new elements.NARefAlt({ref:null,alt:alt}),
+  rna_dup    = 'dup' <rna*>:ref                -> new elements.Dup({ref:ref}),
+  rna_inv    = 'inv' (<num>|<rna*>):ref        -> new elements.Inv({ref:null}),
+  rna_con    = 'con' hgvs_position:pos         -> new elements.Conv({from_ac:pos.ac, from_type:pos.type, from_pos:pos.pos}),
 
   pro_edit_mu = pro_edit | '(' pro_edit:edit ')' -> edit.setUncertain(),
   pro_edit   = pro_fs | pro_ext | pro_subst | pro_delins | pro_ins | pro_del | pro_dup | pro_ident,
-  pro_subst  = (aat13|'?'):alt                 -> elements.AASub({ref:'',alt:alt}),
-  pro_delins = 'delins' aat13_seq:alt          -> elements.AASub({ref:'',alt:alt}),
-  pro_del    = 'del'                           -> elements.AASub({ref:'',alt:alt}),
-  pro_ins    = 'ins' aat13_seq:alt             -> elements.AASub({ref:null,alt:alt}),
-  pro_dup    = 'dup'                           -> elements.Dup({ref:''}),
-  pro_fs     = (aat13 | (-> '')):alt fs:length -> elements.AAFs({ref:'', alt:alt, length:length}),
-  pro_ext    = aat13?:alt ext:ext              -> elements.AAExt({ref:'', alt:alt, aaterm:ext.aaterm, length:ext.length}),
-  pro_ident  = '='                             -> elements.AARefAlt({ref:'',alt:''}),
+  pro_subst  = (aat13|'?'):alt                 -> new elements.AASub({ref:'',alt:alt}),
+  pro_delins = 'delins' aat13_seq:alt          -> new elements.AASub({ref:'',alt:alt}),
+  pro_del    = 'del'                           -> new elements.AASub({ref:'',alt:alt}),
+  pro_ins    = 'ins' aat13_seq:alt             -> new elements.AASub({ref:null,alt:alt}),
+  pro_dup    = 'dup'                           -> new elements.Dup({ref:''}),
+  pro_fs     = (aat13 | (-> '')):alt fs:length -> new elements.AAFs({ref:'', alt:alt, length:length}),
+  pro_ext    = aat13?:alt ext:ext              -> new elements.AAExt({ref:'', alt:alt, aaterm:ext.aaterm, length:ext.length}),
+  pro_ident  = '='                             -> new elements.AARefAlt({ref:'',alt:''}),
 
 
   ////////////////////////////////////////////////////////////////////////////
@@ -169,12 +161,12 @@ ometa HGVS {
   r_interval = def_r_interval | '(' def_r_interval:iv ')' -> iv.setUncertain(),
 
   // definite intervals
-  def_g_interval = (g_pos:start '_' g_pos:end -> elements.Interval({start:start, end:end})) | (g_pos:start -> elements.Interval({start:start,end:elements.deepcopy(start)})),
-  def_m_interval = (m_pos:start '_' m_pos:end -> elements.Interval({start:start, end:end})) | (m_pos:start -> elements.Interval({start:start,end:elements.deepcopy(start)})),
-  def_p_interval = (p_pos:start '_' p_pos:end -> elements.Interval({start:start, end:end})) | (p_pos:start -> elements.Interval({start:start,end:elements.deepcopy(start)})),
-  def_r_interval = (r_pos:start '_' r_pos:end -> elements.Interval({start:start, end:end})) | (r_pos:start -> elements.Interval({start:start,end:elements.deepcopy(start)})),
-  def_c_interval = (c_pos:start '_' c_pos:end -> elements.BaseInterval({start:start, end:end})) | (c_pos:start -> elements.BaseOffsetInterval({start:start,end:elements.deepcopy(start)})),
-  def_n_interval = (n_pos:start '_' n_pos:end -> elements.BaseInterval({start:start, end:end})) | (n_pos:start -> elements.BaseOffsetInterval({start:start,end:elements.deepcopy(start)})),
+  def_g_interval = (g_pos:start '_' g_pos:end -> new elements.Interval({start:start, end:end})) | (g_pos:start -> start),
+  def_m_interval = (m_pos:start '_' m_pos:end -> new elements.Interval({start:start, end:end})) | (m_pos:start -> start),
+  def_p_interval = (p_pos:start '_' p_pos:end -> new elements.Interval({start:start, end:end})) | (p_pos:start -> start),
+  def_r_interval = (r_pos:start '_' r_pos:end -> new elements.Interval({start:start, end:end})) | (r_pos:start -> start),
+  def_c_interval = (c_pos:start '_' c_pos:end -> new elements.BaseInterval({start:start, end:end})) | (c_pos:start -> start),
+  def_n_interval = (n_pos:start '_' n_pos:end -> new elements.BaseInterval({start:start, end:end})) | (n_pos:start -> start),
 
   // positions
   c_pos = def_c_pos | '(' def_c_pos:pos ')' -> pos.setUncertain(),
@@ -185,13 +177,13 @@ ometa HGVS {
   r_pos = def_r_pos | '(' def_r_pos:pos ')' -> pos.setUncertain(),
 
   // definite positions
-  def_c_pos = base:b offset:o -> elements.BaseOffsetPosition({base:b,offset:o,datum:constants.CDS_START})
-        | '*' num:b offset:o -> elements.BaseOffsetPosition({base:b,offset:o,datum:constants.CDS_END}),
-  def_g_pos = (num|'?'->null):pos -> elements.SimplePosition(pos),
-  def_m_pos = (num|'?'->null):pos -> elements.SimplePosition(pos),
-  def_n_pos = base:b offset:o -> elements.BaseOffsetPosition({base:b,offset:o,datum:constants.SEQ_START}),
-  def_p_pos = (term13|aa13):aa num:pos -> elements.AAPosition({base:pos,aa:aa_to_aa1(aa)}),
-  def_r_pos = base:b offset:o -> elements.BaseOffsetPosition({base:b,offset:o,datum:constants.SEQ_START}),
+  def_c_pos = base:b offset:o -> new elements.BaseOffsetPosition({base:b,offset:o,datum:constants.CDS_START})
+        | '*' num:b offset:o -> new elements.BaseOffsetPosition({base:b,offset:o,datum:constants.CDS_END}),
+  def_g_pos = (num|'?'->null):pos -> pos,
+  def_m_pos = (num|'?'->null):pos -> pos,
+  def_n_pos = base:b offset:o -> new elements.BaseOffsetPosition({base:b,offset:o,datum:constants.SEQ_START}),
+  def_p_pos = (term13|aa13):aa num:pos -> new elements.AAPosition({base:pos,aa:aa_to_aa1(aa)}),
+  def_r_pos = base:b offset:o -> new elements.BaseOffsetPosition({base:b,offset:o,datum:constants.SEQ_START}),
 
 
   ////////////////////////////////////////////////////////////////////////////

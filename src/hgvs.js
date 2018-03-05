@@ -28,142 +28,154 @@ require("util").inherits(HGVS, AbstractGrammar);
 
 HGVS.prototype["hgvs_variant"] = function $hgvs_variant() {
     return this._atomic(function() {
-        return this._rule("g_variant", false, [], null, this["g_variant"]);
+        return this._rule("g_seq_variant", false, [], null, this["g_seq_variant"]);
     }) || this._atomic(function() {
-        return this._rule("m_variant", false, [], null, this["m_variant"]);
+        return this._rule("m_seq_variant", false, [], null, this["m_seq_variant"]);
     }) || this._atomic(function() {
-        return this._rule("c_variant", false, [], null, this["c_variant"]);
+        return this._rule("c_seq_variant", false, [], null, this["c_seq_variant"]);
     }) || this._atomic(function() {
-        return this._rule("n_variant", false, [], null, this["n_variant"]);
+        return this._rule("n_seq_variant", false, [], null, this["n_seq_variant"]);
     }) || this._atomic(function() {
-        return this._rule("r_variant", false, [], null, this["r_variant"]);
+        return this._rule("r_seq_variant", false, [], null, this["r_seq_variant"]);
     }) || this._atomic(function() {
-        return this._rule("p_variant", false, [], null, this["p_variant"]);
+        return this._rule("p_seq_variant", false, [], null, this["p_seq_variant"]);
     });
 };
 
-HGVS.prototype["c_variant"] = function $c_variant() {
+HGVS.prototype["c_seq_variant"] = function $c_seq_variant() {
     var ac, type, variant;
     return this._rule("accn", false, [], null, this["accn"]) && (ac = this._getIntermediate(), true) && this._match(":") && this._match("c") && (type = this._getIntermediate(), true) && this._match(".") && (this._atomic(function() {
-        return this._rule("c_phased_alleles", false, [], null, this["c_phased_alleles"]);
+        return this._rule("c_unphased_variant", false, [], null, this["c_unphased_variant"]);
     }) || this._atomic(function() {
-        return this._rule("c_trans_alleles", false, [], null, this["c_trans_alleles"]);
+        return this._rule("c_trans_variant", false, [], null, this["c_trans_variant"]);
     }) || this._atomic(function() {
-        return this._rule("c_allele", false, [], null, this["c_allele"]);
+        return this._rule("c_cis_variant", false, [], null, this["c_cis_variant"]);
     }) || this._atomic(function() {
-        return this._rule("c_posedit", false, [], null, this["c_posedit"]);
-    })) && (variant = this._getIntermediate(), true) && this._exec(elements.SequenceVariant({
+        return this._rule("c_simple_variant", false, [], null, this["c_simple_variant"]);
+    })) && (variant = this._getIntermediate(), true) && this._exec(new elements.SequenceVariant({
         ac: ac,
         type: type,
         variant: variant
     }));
 };
 
-HGVS.prototype["g_variant"] = function $g_variant() {
+HGVS.prototype["g_seq_variant"] = function $g_seq_variant() {
     var ac, type, variant;
     return this._rule("accn", false, [], null, this["accn"]) && (ac = this._getIntermediate(), true) && this._match(":") && this._match("g") && (type = this._getIntermediate(), true) && this._match(".") && (this._atomic(function() {
-        return this._rule("g_phased_alleles", false, [], null, this["g_phased_alleles"]);
+        return this._rule("g_unphased_variant", false, [], null, this["g_unphased_variant"]);
     }) || this._atomic(function() {
-        return this._rule("g_trans_alleles", false, [], null, this["g_trans_alleles"]);
+        return this._rule("g_trans_variant", false, [], null, this["g_trans_variant"]);
     }) || this._atomic(function() {
-        return this._rule("g_allele", false, [], null, this["g_allele"]);
+        return this._rule("g_cis_variant", false, [], null, this["g_cis_variant"]);
     }) || this._atomic(function() {
-        return this._rule("g_posedit", false, [], null, this["g_posedit"]);
-    })) && (variant = this._getIntermediate(), true) && this._exec(elements.SequenceVariant({
+        return this._rule("g_simple_variant", false, [], null, this["g_simple_variant"]);
+    })) && (variant = this._getIntermediate(), true) && this._exec(new elements.SequenceVariant({
         ac: ac,
         type: type,
         variant: variant
     }));
 };
 
-HGVS.prototype["m_variant"] = function $m_variant() {
+HGVS.prototype["m_seq_variant"] = function $m_seq_variant() {
     var ac, type, variant;
-    return this._rule("accn", false, [], null, this["accn"]) && (ac = this._getIntermediate(), true) && this._match(":") && this._match("m") && (type = this._getIntermediate(), true) && this._match(".") && this._rule("m_posedit", false, [], null, this["m_posedit"]) && (variant = this._getIntermediate(), true) && this._exec(elements.SequenceVariant({
+    return this._rule("accn", false, [], null, this["accn"]) && (ac = this._getIntermediate(), true) && this._match(":") && this._match("m") && (type = this._getIntermediate(), true) && this._match(".") && this._rule("m_simple_variant", false, [], null, this["m_simple_variant"]) && (variant = this._getIntermediate(), true) && this._exec(new elements.SequenceVariant({
         ac: ac,
         type: type,
         variant: variant
     }));
 };
 
-HGVS.prototype["n_variant"] = function $n_variant() {
+HGVS.prototype["n_seq_variant"] = function $n_seq_variant() {
     var ac, type, variant;
-    return this._rule("accn", false, [], null, this["accn"]) && (ac = this._getIntermediate(), true) && this._match(":") && this._match("n") && (type = this._getIntermediate(), true) && this._match(".") && this._rule("n_posedit", false, [], null, this["n_posedit"]) && (variant = this._getIntermediate(), true) && this._exec(elements.SequenceVariant({
+    return this._rule("accn", false, [], null, this["accn"]) && (ac = this._getIntermediate(), true) && this._match(":") && this._match("n") && (type = this._getIntermediate(), true) && this._match(".") && this._rule("n_simple_variant", false, [], null, this["n_simple_variant"]) && (variant = this._getIntermediate(), true) && this._exec(new elements.SequenceVariant({
         ac: ac,
         type: type,
         variant: variant
     }));
 };
 
-HGVS.prototype["p_variant"] = function $p_variant() {
+HGVS.prototype["p_seq_variant"] = function $p_seq_variant() {
     var ac, type, variant;
-    return this._rule("accn", false, [], null, this["accn"]) && (ac = this._getIntermediate(), true) && this._match(":") && this._match("p") && (type = this._getIntermediate(), true) && this._match(".") && this._rule("p_posedit", false, [], null, this["p_posedit"]) && (variant = this._getIntermediate(), true) && this._exec(elements.SequenceVariant({
+    return this._rule("accn", false, [], null, this["accn"]) && (ac = this._getIntermediate(), true) && this._match(":") && this._match("p") && (type = this._getIntermediate(), true) && this._match(".") && this._rule("p_simple_variant", false, [], null, this["p_simple_variant"]) && (variant = this._getIntermediate(), true) && this._exec(new elements.SequenceVariant({
         ac: ac,
         type: type,
         variant: variant
     }));
 };
 
-HGVS.prototype["r_variant"] = function $r_variant() {
+HGVS.prototype["r_seq_variant"] = function $r_seq_variant() {
     var ac, type, variant;
-    return this._rule("accn", false, [], null, this["accn"]) && (ac = this._getIntermediate(), true) && this._match(":") && this._match("r") && (type = this._getIntermediate(), true) && this._match(".") && this._rule("r_posedit", false, [], null, this["r_posedit"]) && (variant = this._getIntermediate(), true) && this._exec(elements.SequenceVariant({
+    return this._rule("accn", false, [], null, this["accn"]) && (ac = this._getIntermediate(), true) && this._match(":") && this._match("r") && (type = this._getIntermediate(), true) && this._match(".") && this._rule("r_simple_variant", false, [], null, this["r_simple_variant"]) && (variant = this._getIntermediate(), true) && this._exec(new elements.SequenceVariant({
         ac: ac,
         type: type,
         variant: variant
     }));
 };
 
-HGVS.prototype["c_typed_posedit"] = function $c_typed_posedit() {
+HGVS.prototype["c_typed_simple_variant"] = function $c_typed_simple_variant() {
     var type, variant;
-    return this._match("c") && (type = this._getIntermediate(), true) && this._match(".") && this._list(function() {
-        return this._rule("c_phased_alleles", false, [], null, this["c_phased_alleles"]) && this._skip() && this._rule("c_trans_alleles", false, [], null, this["c_trans_alleles"]) && this._skip() && this._rule("c_allele", false, [], null, this["c_allele"]) && this._skip() && this._rule("c_posedit", false, [], null, this["c_posedit"]);
-    }, true) && (variant = this._getIntermediate(), true) && this._exec(elements.SequenceVariant({
+    return this._match("c") && (type = this._getIntermediate(), true) && this._match(".") && (this._atomic(function() {
+        return this._rule("c_unphased_variant", false, [], null, this["c_unphased_variant"]);
+    }) || this._atomic(function() {
+        return this._rule("c_trans_variant", false, [], null, this["c_trans_variant"]);
+    }) || this._atomic(function() {
+        return this._rule("c_cis_variant", false, [], null, this["c_cis_variant"]);
+    }) || this._atomic(function() {
+        return this._rule("c_simple_variant", false, [], null, this["c_simple_variant"]);
+    })) && (variant = this._getIntermediate(), true) && this._exec(new elements.SequenceVariant({
         ac: null,
         type: type,
         variant: variant
     }));
 };
 
-HGVS.prototype["g_typed_posedit"] = function $g_typed_posedit() {
+HGVS.prototype["g_typed_simple_variant"] = function $g_typed_simple_variant() {
     var type, variant;
-    return this._match("g") && (type = this._getIntermediate(), true) && this._match(".") && this._list(function() {
-        return this._rule("g_phased_alleles", false, [], null, this["g_phased_alleles"]) && this._skip() && this._rule("g_trans_alleles", false, [], null, this["g_trans_alleles"]) && this._skip() && this._rule("g_allele", false, [], null, this["g_allele"]) && this._skip() && this._rule("g_posedit", false, [], null, this["g_posedit"]);
-    }, true) && (variant = this._getIntermediate(), true) && this._exec(elements.SequenceVariant({
+    return this._match("g") && (type = this._getIntermediate(), true) && this._match(".") && (this._atomic(function() {
+        return this._rule("g_unphased_variant", false, [], null, this["g_unphased_variant"]);
+    }) || this._atomic(function() {
+        return this._rule("g_trans_variant", false, [], null, this["g_trans_variant"]);
+    }) || this._atomic(function() {
+        return this._rule("g_cis_variant", false, [], null, this["g_cis_variant"]);
+    }) || this._atomic(function() {
+        return this._rule("g_simple_variant", false, [], null, this["g_simple_variant"]);
+    })) && (variant = this._getIntermediate(), true) && this._exec(new elements.SequenceVariant({
         ac: ac,
         type: type,
         variant: variant
     }));
 };
 
-HGVS.prototype["m_typed_posedit"] = function $m_typed_posedit() {
+HGVS.prototype["m_typed_simple_variant"] = function $m_typed_simple_variant() {
     var type, variant;
-    return this._match("m") && (type = this._getIntermediate(), true) && this._match(".") && this._rule("m_posedit", false, [], null, this["m_posedit"]) && (variant = this._getIntermediate(), true) && this._exec(elements.SequenceVariant({
+    return this._match("m") && (type = this._getIntermediate(), true) && this._match(".") && this._rule("m_simple_variant", false, [], null, this["m_simple_variant"]) && (variant = this._getIntermediate(), true) && this._exec(new elements.SequenceVariant({
         ac: null,
         type: type,
         variant: variant
     }));
 };
 
-HGVS.prototype["n_typed_posedit"] = function $n_typed_posedit() {
+HGVS.prototype["n_typed_simple_variant"] = function $n_typed_simple_variant() {
     var type, variant;
-    return this._match("n") && (type = this._getIntermediate(), true) && this._match(".") && this._rule("n_posedit", false, [], null, this["n_posedit"]) && (variant = this._getIntermediate(), true) && this._exec(elements.SequenceVariant({
+    return this._match("n") && (type = this._getIntermediate(), true) && this._match(".") && this._rule("n_simple_variant", false, [], null, this["n_simple_variant"]) && (variant = this._getIntermediate(), true) && this._exec(new elements.SequenceVariant({
         ac: null,
         type: type,
         variant: variant
     }));
 };
 
-HGVS.prototype["p_typed_posedit"] = function $p_typed_posedit() {
+HGVS.prototype["p_typed_simple_variant"] = function $p_typed_simple_variant() {
     var type, variant;
-    return this._match("p") && (type = this._getIntermediate(), true) && this._match(".") && this._rule("p_posedit", false, [], null, this["p_posedit"]) && (variant = this._getIntermediate(), true) && this._exec(elements.SequenceVariant({
+    return this._match("p") && (type = this._getIntermediate(), true) && this._match(".") && this._rule("p_simple_variant", false, [], null, this["p_simple_variant"]) && (variant = this._getIntermediate(), true) && this._exec(new elements.SequenceVariant({
         ac: null,
         type: type,
         variant: variant
     }));
 };
 
-HGVS.prototype["r_typed_posedit"] = function $r_typed_posedit() {
+HGVS.prototype["r_typed_simple_variant"] = function $r_typed_simple_variant() {
     var type, variant;
-    return this._match("r") && (type = this._getIntermediate(), true) && this._match(".") && this._rule("r_posedit", false, [], null, this["r_posedit"]) && (variant = this._getIntermediate(), true) && this._exec(elements.SequenceVariant({
+    return this._match("r") && (type = this._getIntermediate(), true) && this._match(".") && this._rule("r_simple_variant", false, [], null, this["r_simple_variant"]) && (variant = this._getIntermediate(), true) && this._exec(new elements.SequenceVariant({
         ac: null,
         type: type,
         variant: variant
@@ -188,7 +200,7 @@ HGVS.prototype["hgvs_position"] = function $hgvs_position() {
 
 HGVS.prototype["c_hgvs_position"] = function $c_hgvs_position() {
     var ac, type, pos;
-    return this._rule("accn", false, [], null, this["accn"]) && (ac = this._getIntermediate(), true) && this._match(":") && this._match("c") && (type = this._getIntermediate(), true) && this._match(".") && this._rule("c_interval", false, [], null, this["c_interval"]) && (pos = this._getIntermediate(), true) && this._exec(elements.HGVSPosition({
+    return this._rule("accn", false, [], null, this["accn"]) && (ac = this._getIntermediate(), true) && this._match(":") && this._match("c") && (type = this._getIntermediate(), true) && this._match(".") && this._rule("c_interval", false, [], null, this["c_interval"]) && (pos = this._getIntermediate(), true) && this._exec(new elements.HGVSPosition({
         ac: ac,
         type: type,
         pos: post
@@ -197,7 +209,7 @@ HGVS.prototype["c_hgvs_position"] = function $c_hgvs_position() {
 
 HGVS.prototype["g_hgvs_position"] = function $g_hgvs_position() {
     var ac, type, pos;
-    return this._rule("accn", false, [], null, this["accn"]) && (ac = this._getIntermediate(), true) && this._match(":") && this._match("g") && (type = this._getIntermediate(), true) && this._match(".") && this._rule("g_interval", false, [], null, this["g_interval"]) && (pos = this._getIntermediate(), true) && this._exec(elements.HGVSPosition({
+    return this._rule("accn", false, [], null, this["accn"]) && (ac = this._getIntermediate(), true) && this._match(":") && this._match("g") && (type = this._getIntermediate(), true) && this._match(".") && this._rule("g_interval", false, [], null, this["g_interval"]) && (pos = this._getIntermediate(), true) && this._exec(new elements.HGVSPosition({
         ac: ac,
         type: type,
         pos: post
@@ -206,7 +218,7 @@ HGVS.prototype["g_hgvs_position"] = function $g_hgvs_position() {
 
 HGVS.prototype["m_hgvs_position"] = function $m_hgvs_position() {
     var ac, type, pos;
-    return this._rule("accn", false, [], null, this["accn"]) && (ac = this._getIntermediate(), true) && this._match(":") && this._match("m") && (type = this._getIntermediate(), true) && this._match(".") && this._rule("m_interval", false, [], null, this["m_interval"]) && (pos = this._getIntermediate(), true) && this._exec(elements.HGVSPosition({
+    return this._rule("accn", false, [], null, this["accn"]) && (ac = this._getIntermediate(), true) && this._match(":") && this._match("m") && (type = this._getIntermediate(), true) && this._match(".") && this._rule("m_interval", false, [], null, this["m_interval"]) && (pos = this._getIntermediate(), true) && this._exec(new elements.HGVSPosition({
         ac: ac,
         type: type,
         pos: post
@@ -215,7 +227,7 @@ HGVS.prototype["m_hgvs_position"] = function $m_hgvs_position() {
 
 HGVS.prototype["n_hgvs_position"] = function $n_hgvs_position() {
     var ac, type, pos;
-    return this._rule("accn", false, [], null, this["accn"]) && (ac = this._getIntermediate(), true) && this._match(":") && this._match("n") && (type = this._getIntermediate(), true) && this._match(".") && this._rule("n_interval", false, [], null, this["n_interval"]) && (pos = this._getIntermediate(), true) && this._exec(elements.HGVSPosition({
+    return this._rule("accn", false, [], null, this["accn"]) && (ac = this._getIntermediate(), true) && this._match(":") && this._match("n") && (type = this._getIntermediate(), true) && this._match(".") && this._rule("n_interval", false, [], null, this["n_interval"]) && (pos = this._getIntermediate(), true) && this._exec(new elements.HGVSPosition({
         ac: ac,
         type: type,
         pos: post
@@ -224,7 +236,7 @@ HGVS.prototype["n_hgvs_position"] = function $n_hgvs_position() {
 
 HGVS.prototype["p_hgvs_position"] = function $p_hgvs_position() {
     var ac, type, pos;
-    return this._rule("accn", false, [], null, this["accn"]) && (ac = this._getIntermediate(), true) && this._match(":") && this._match("p") && (type = this._getIntermediate(), true) && this._match(".") && this._rule("p_interval", false, [], null, this["p_interval"]) && (pos = this._getIntermediate(), true) && this._exec(elements.HGVSPosition({
+    return this._rule("accn", false, [], null, this["accn"]) && (ac = this._getIntermediate(), true) && this._match(":") && this._match("p") && (type = this._getIntermediate(), true) && this._match(".") && this._rule("p_interval", false, [], null, this["p_interval"]) && (pos = this._getIntermediate(), true) && this._exec(new elements.HGVSPosition({
         ac: ac,
         type: type,
         pos: post
@@ -233,197 +245,160 @@ HGVS.prototype["p_hgvs_position"] = function $p_hgvs_position() {
 
 HGVS.prototype["r_hgvs_position"] = function $r_hgvs_position() {
     var ac, type, pos;
-    return this._rule("accn", false, [], null, this["accn"]) && (ac = this._getIntermediate(), true) && this._match(":") && this._match("r") && (type = this._getIntermediate(), true) && this._match(".") && this._rule("r_interval", false, [], null, this["r_interval"]) && (pos = this._getIntermediate(), true) && this._exec(elements.HGVSPosition({
+    return this._rule("accn", false, [], null, this["accn"]) && (ac = this._getIntermediate(), true) && this._match(":") && this._match("r") && (type = this._getIntermediate(), true) && this._match(".") && this._rule("r_interval", false, [], null, this["r_interval"]) && (pos = this._getIntermediate(), true) && this._exec(new elements.HGVSPosition({
         ac: ac,
         type: type,
         pos: post
     }));
 };
 
-HGVS.prototype["c_posedit_list"] = function $c_posedit_list() {
-    var edit, list, edit;
-    return this._atomic(function() {
-        return this._rule("c_posedit", false, [], null, this["c_posedit"]) && (edit = this._getIntermediate(), true) && this._exec([ edit ]);
-    }) || this._atomic(function() {
-        return this._rule("c_posedit_list", false, [], null, this["c_posedit_list"]) && (list = this._getIntermediate(), true) && this._match(";") && this._rule("c_posedit", false, [], null, this["c_posedit"]) && (edit = this._getIntermediate(), true) && this._exec(list + [ edit ]);
-    });
-};
-
-HGVS.prototype["g_posedit_list"] = function $g_posedit_list() {
-    var edit, list, edit;
-    return this._atomic(function() {
-        return this._rule("g_posedit", false, [], null, this["g_posedit"]) && (edit = this._getIntermediate(), true) && this._exec([ edit ]);
-    }) || this._atomic(function() {
-        return this._rule("g_posedit_list", false, [], null, this["g_posedit_list"]) && (list = this._getIntermediate(), true) && this._match(";") && this._rule("g_posedit", false, [], null, this["g_posedit"]) && (edit = this._getIntermediate(), true) && this._exec(list + [ edit ]);
-    });
-};
-
-HGVS.prototype["c_allele"] = function $c_allele() {
+HGVS.prototype["c_cis_variant"] = function $c_cis_variant() {
     var edits;
-    return this._match("[") && this._rule("c_posedit_list", false, [], null, this["c_posedit_list"]) && (edits = this._getIntermediate(), true) && this._match("]") && this._exec(elements.Allele({
-        edits: edits
+    return this._match("[") && this._rule("listOf", false, [ "c_simple_variant", ";" ], null, this["listOf"]) && (edits = this._getIntermediate(), true) && edits.length > 0 && this._match("]") && this._exec(new elements.CisVariant({
+        variants: edits
     }));
 };
 
-HGVS.prototype["g_allele"] = function $g_allele() {
+HGVS.prototype["g_cis_variant"] = function $g_cis_variant() {
     var edits;
-    return this._match("[") && this._rule("g_posedit_list", false, [], null, this["g_posedit_list"]) && (edits = this._getIntermediate(), true) && this._match("]") && this._exec(elements.Allele({
-        edits: edits
+    return this._match("[") && this._rule("listOf", false, [ "g_simple_variant", ";" ], null, this["listOf"]) && (edits = this._getIntermediate(), true) && edits.length > 0 && this._match("]") && this._exec(new elements.CisVariant({
+        variants: edits
     }));
 };
 
-HGVS.prototype["c_trans_alleles"] = function $c_trans_alleles() {
-    var allele2, trans_alleles;
+HGVS.prototype["c_trans_variant"] = function $c_trans_variant() {
+    var cis_variants;
+    return this._rule("listOf", false, [ "c_cis_variant", ";" ], null, this["listOf"]) && (cis_variants = this._getIntermediate(), true) && cis_variants.length > 1 && this._exec(new elements.TransVariant({
+        variants: cis_variants
+    })) && this._skip();
+};
+
+HGVS.prototype["g_trans_variant"] = function $g_trans_variant() {
+    var cis_variants;
+    return this._rule("listOf", false, [ "g_cis_variant", ";" ], null, this["listOf"]) && (cis_variants = this._getIntermediate(), true) && cis_variants.length > 1 && this._exec(new elements.TransVariant({
+        variants: cis_variants
+    }));
+};
+
+HGVS.prototype["c_phased_variants"] = function $c_phased_variants() {
     return this._atomic(function() {
-        var allele1;
-        return this._rule("c_allele", false, [], null, this["c_allele"]) && (allele1 = this._getIntermediate(), true) && this._match(";") && this._rule("c_allele", false, [], null, this["c_allele"]) && (allele2 = this._getIntermediate(), true) && this._exec(elements.TransAlleles({
-            alleles: [ allele1, allele2 ]
-        }));
+        return this._rule("c_trans_variant", false, [], null, this["c_trans_variant"]);
     }) || this._atomic(function() {
-        return this._rule("c_trans_alleles", false, [], null, this["c_trans_alleles"]) && (trans_alleles = this._getIntermediate(), true) && this._exec(trans_alleles.alleles.push(allele1));
+        return this._rule("c_cis_variant", false, [], null, this["c_cis_variant"]);
     });
 };
 
-HGVS.prototype["g_trans_alleles"] = function $g_trans_alleles() {
-    var allele2, trans_alleles;
+HGVS.prototype["g_phased_variants"] = function $g_phased_variants() {
     return this._atomic(function() {
-        var allele1;
-        return this._rule("g_allele", false, [], null, this["g_allele"]) && (allele1 = this._getIntermediate(), true) && this._match(";") && this._rule("g_allele", false, [], null, this["g_allele"]) && (allele2 = this._getIntermediate(), true) && this._exec(elements.TransAlleles({
-            alleles: [ allele1, allele2 ]
-        }));
+        return this._rule("g_trans_variant", false, [], null, this["g_trans_variant"]);
     }) || this._atomic(function() {
-        return this._rule("g_trans_alleles", false, [], null, this["g_trans_alleles"]) && (trans_alleles = this._getIntermediate(), true) && this._exec(trans_alleles.alleles.push(allele1));
+        return this._rule("g_cis_variant", false, [], null, this["g_cis_variant"]);
     });
 };
 
-HGVS.prototype["c_phased_alleles"] = function $c_phased_alleles() {
-    return this._atomic(function() {
-        return this._rule("c_trans_alleles", false, [], null, this["c_trans_alleles"]);
-    }) || this._atomic(function() {
-        return this._rule("c_allele", false, [], null, this["c_allele"]);
-    });
+HGVS.prototype["c_unphased_variant"] = function $c_unphased_variant() {
+    var cis_variants;
+    return this._rule("listOf", false, [ "c_phased_variants", "(;)" ], null, this["listOf"]) && (cis_variants = this._getIntermediate(), true) && cis_variants.length > 1 && this._exec(new elements.UnphasedVariant({
+        variants: cis_variants
+    }));
 };
 
-HGVS.prototype["g_phased_alleles"] = function $g_phased_alleles() {
-    return this._atomic(function() {
-        return this._rule("g_trans_alleles", false, [], null, this["g_trans_alleles"]);
-    }) || this._atomic(function() {
-        return this._rule("g_allele", false, [], null, this["g_allele"]);
-    });
+HGVS.prototype["g_unphased_variant"] = function $g_unphased_variant() {
+    var cis_variants;
+    return this._rule("listOf", false, [ "g_phased_variants", "(;)" ], null, this["listOf"]) && (cis_variants = this._getIntermediate(), true) && cis_variants.length > 1 && this._exec(new elements.UnphasedVariant({
+        variants: cis_variants
+    }));
 };
 
-HGVS.prototype["c_unphased_alleles"] = function $c_unphased_alleles() {
-    var allele2, unphased, allele2, unphased;
-    return this._atomic(function() {
-        return this._atomic(function() {
-            var allele1;
-            return this._rule("c_phased_alleles", false, [], null, this["c_phased_alleles"]) && (allele1 = this._getIntermediate(), true) && this._match("(;)") && this._rule("c_phased_alleles", false, [], null, this["c_phased_alleles"]) && (allele2 = this._getIntermediate(), true) && this._exec(elements.UnphasedAlleles({
-                alleles: [ allele1, allele2 ]
-            }));
-        }) || this._atomic(function() {
-            return this._rule("c_unphased_alleles", false, [], null, this["c_unphased_alleles"]) && (unphased = this._getIntermediate(), true) && this._exec(unphased.alleles.push(allele1));
-        });
-    }) || this._atomic(function() {
-        return this._atomic(function() {
-            var allele1;
-            return this._rule("g_phased_alleles", false, [], null, this["g_phased_alleles"]) && (allele1 = this._getIntermediate(), true) && this._match("(;)") && this._rule("g_phased_alleles", false, [], null, this["g_phased_alleles"]) && (allele2 = this._getIntermediate(), true) && this._exec(elements.UnphasedAlleles({
-                alleles: [ allele1, allele2 ]
-            }));
-        }) || this._atomic(function() {
-            return this._rule("g_unphased_alleles", false, [], null, this["g_unphased_alleles"]) && (unphased = this._getIntermediate(), true) && this._exec(unphased.alleles.push(allele1));
-        });
-    });
-};
-
-HGVS.prototype["c_posedit"] = function $c_posedit() {
+HGVS.prototype["c_simple_variant"] = function $c_simple_variant() {
     var pos, edit;
-    return this._rule("c_interval", false, [], null, this["c_interval"]) && (pos = this._getIntermediate(), true) && this._rule("dna_edit", false, [], null, this["dna_edit"]) && (edit = this._getIntermediate(), true) && this._exec(elements.PosEdit({
+    return this._rule("c_interval", false, [], null, this["c_interval"]) && (pos = this._getIntermediate(), true) && this._rule("dna_edit", false, [], null, this["dna_edit"]) && (edit = this._getIntermediate(), true) && this._exec(new elements.SimpleVariant({
         pos: pos,
         edit: edit
     }));
 };
 
-HGVS.prototype["g_posedit"] = function $g_posedit() {
+HGVS.prototype["g_simple_variant"] = function $g_simple_variant() {
     var pos, edit;
-    return this._rule("g_interval", false, [], null, this["g_interval"]) && (pos = this._getIntermediate(), true) && this._rule("dna_edit", false, [], null, this["dna_edit"]) && (edit = this._getIntermediate(), true) && this._exec(elements.PosEdit({
+    return this._rule("g_interval", false, [], null, this["g_interval"]) && (pos = this._getIntermediate(), true) && this._rule("dna_edit", false, [], null, this["dna_edit"]) && (edit = this._getIntermediate(), true) && this._exec(new elements.SimpleVariant({
         pos: pos,
         edit: edit
     }));
 };
 
-HGVS.prototype["m_posedit"] = function $m_posedit() {
+HGVS.prototype["m_simple_variant"] = function $m_simple_variant() {
     var pos, edit;
-    return this._rule("m_interval", false, [], null, this["m_interval"]) && (pos = this._getIntermediate(), true) && this._rule("dna_edit", false, [], null, this["dna_edit"]) && (edit = this._getIntermediate(), true) && this._exec(elements.PosEdit({
+    return this._rule("m_interval", false, [], null, this["m_interval"]) && (pos = this._getIntermediate(), true) && this._rule("dna_edit", false, [], null, this["dna_edit"]) && (edit = this._getIntermediate(), true) && this._exec(new elements.SimpleVariant({
         pos: pos,
         edit: edit
     }));
 };
 
-HGVS.prototype["n_posedit"] = function $n_posedit() {
+HGVS.prototype["n_simple_variant"] = function $n_simple_variant() {
     var pos, edit;
-    return this._rule("n_interval", false, [], null, this["n_interval"]) && (pos = this._getIntermediate(), true) && this._rule("dna_edit", false, [], null, this["dna_edit"]) && (edit = this._getIntermediate(), true) && this._exec(elements.PosEdit({
+    return this._rule("n_interval", false, [], null, this["n_interval"]) && (pos = this._getIntermediate(), true) && this._rule("dna_edit", false, [], null, this["dna_edit"]) && (edit = this._getIntermediate(), true) && this._exec(new elements.SimpleVariant({
         pos: pos,
         edit: edit
     }));
 };
 
-HGVS.prototype["r_posedit"] = function $r_posedit() {
+HGVS.prototype["r_simple_variant"] = function $r_simple_variant() {
     var pos, edit, pos, edit;
     return this._atomic(function() {
-        return this._rule("r_interval", false, [], null, this["r_interval"]) && (pos = this._getIntermediate(), true) && this._rule("rna_edit", false, [], null, this["rna_edit"]) && (edit = this._getIntermediate(), true) && this._exec(elements.PosEdit({
+        return this._rule("r_interval", false, [], null, this["r_interval"]) && (pos = this._getIntermediate(), true) && this._rule("rna_edit", false, [], null, this["rna_edit"]) && (edit = this._getIntermediate(), true) && this._exec(new elements.SimpleVariant({
             pos: pos,
             edit: edit
         }));
     }) || this._atomic(function() {
-        return this._match("(") && this._rule("r_interval", false, [], null, this["r_interval"]) && (pos = this._getIntermediate(), true) && this._rule("rna_edit", false, [], null, this["rna_edit"]) && (edit = this._getIntermediate(), true) && this._match(")") && this._exec(elements.PosEdit({
+        return this._match("(") && this._rule("r_interval", false, [], null, this["r_interval"]) && (pos = this._getIntermediate(), true) && this._rule("rna_edit", false, [], null, this["rna_edit"]) && (edit = this._getIntermediate(), true) && this._match(")") && this._exec(new elements.SimpleVariant({
             pos: pos,
             edit: edit
         }));
     });
 };
 
-HGVS.prototype["p_posedit"] = function $p_posedit() {
+HGVS.prototype["p_simple_variant"] = function $p_simple_variant() {
     var pos, edit, pos, edit;
     return this._atomic(function() {
-        return this._rule("p_interval", false, [], null, this["p_interval"]) && (pos = this._getIntermediate(), true) && this._rule("pro_edit", false, [], null, this["pro_edit"]) && (edit = this._getIntermediate(), true) && this._exec(elements.PosEdit({
+        return this._rule("p_interval", false, [], null, this["p_interval"]) && (pos = this._getIntermediate(), true) && this._rule("pro_edit", false, [], null, this["pro_edit"]) && (edit = this._getIntermediate(), true) && this._exec(new elements.SimpleVariant({
             pos: pos,
             edit: edit
         }));
     }) || this._atomic(function() {
-        return this._match("(") && this._rule("p_interval", false, [], null, this["p_interval"]) && (pos = this._getIntermediate(), true) && this._rule("pro_edit", false, [], null, this["pro_edit"]) && (edit = this._getIntermediate(), true) && this._match(")") && this._exec(elements.PosEdit({
+        return this._match("(") && this._rule("p_interval", false, [], null, this["p_interval"]) && (pos = this._getIntermediate(), true) && this._rule("pro_edit", false, [], null, this["pro_edit"]) && (edit = this._getIntermediate(), true) && this._match(")") && this._exec(new elements.SimpleVariant({
             pos: pos,
             edit: edit
         }));
     }) || this._atomic(function() {
-        return this._rule("p_posedit_special", false, [], null, this["p_posedit_special"]);
+        return this._rule("p_simple_variant_special", false, [], null, this["p_simple_variant_special"]);
     });
 };
 
-HGVS.prototype["p_posedit_special"] = function $p_posedit_special() {
+HGVS.prototype["p_simple_variant_special"] = function $p_simple_variant_special() {
     return this._atomic(function() {
         var x;
-        return this._match("=") && (x = this._getIntermediate(), true) && this._exec(elements.PosEdit({
+        return this._match("=") && (x = this._getIntermediate(), true) && this._exec(new elements.SimpleVariant({
             pos: null,
             edit: x,
             uncertain: false
         }));
     }) || this._atomic(function() {
         var x;
-        return this._match("(") && this._match("=") && (x = this._getIntermediate(), true) && this._match(")") && this._exec(elements.PosEdit({
+        return this._match("(") && this._match("=") && (x = this._getIntermediate(), true) && this._match(")") && this._exec(new elements.SimpleVariant({
             pos: null,
             edit: x,
             uncertain: true
         }));
     }) || this._atomic(function() {
         var x;
-        return this._match("0") && (x = this._getIntermediate(), true) && this._match("?") && this._exec(elements.PosEdit({
+        return this._match("0") && (x = this._getIntermediate(), true) && this._match("?") && this._exec(new elements.SimpleVariant({
             pos: null,
             edit: x,
             uncertain: true
         }));
     }) || this._atomic(function() {
         var x;
-        return this._match("0") && (x = this._getIntermediate(), true) && this._exec(elements.PosEdit({
+        return this._match("0") && (x = this._getIntermediate(), true) && this._exec(new elements.SimpleVariant({
             pos: null,
             edit: x,
             uncertain: false
@@ -473,15 +448,12 @@ HGVS.prototype["dna_ident"] = function $dna_ident() {
                 return this._rule("dna", false, [], null, this["dna"]);
             });
         });
-    }, true) && (ref = this._getIntermediate(), true) && this._match("=") && this._exec(elements.NARefAlt({
-        ref: ref,
-        alt: ref
-    }));
+    }, true) && (ref = this._getIntermediate(), true) && this._match("=") && this._exec(null);
 };
 
 HGVS.prototype["dna_subst"] = function $dna_subst() {
     var ref, alt;
-    return this._rule("dna", false, [], null, this["dna"]) && (ref = this._getIntermediate(), true) && this._match(">") && this._rule("dna", false, [], null, this["dna"]) && (alt = this._getIntermediate(), true) && this._exec(elements.NARefAlt({
+    return this._rule("dna", false, [], null, this["dna"]) && (ref = this._getIntermediate(), true) && this._match(">") && this._rule("dna", false, [], null, this["dna"]) && (alt = this._getIntermediate(), true) && this._exec(new elements.NARefAlt({
         ref: ref,
         alt: alt
     }));
@@ -507,10 +479,7 @@ HGVS.prototype["dna_delins"] = function $dna_delins() {
                 return this._rule("dna", false, [], null, this["dna"]);
             });
         });
-    }, true) && (alt = this._getIntermediate(), true) && this._exec(elements.NARefAlt({
-        ref: ref,
-        alt: ref
-    }));
+    }, true) && (alt = this._getIntermediate(), true) && this._exec(null);
 };
 
 HGVS.prototype["dna_del"] = function $dna_del() {
@@ -527,7 +496,7 @@ HGVS.prototype["dna_del"] = function $dna_del() {
                 });
             });
         }, true);
-    })) && (ref = this._getIntermediate(), true) && this._exec(elements.NARefAlt({
+    })) && (ref = this._getIntermediate(), true) && this._exec(new elements.NARefAlt({
         ref: ref,
         alt: null
     }));
@@ -541,7 +510,7 @@ HGVS.prototype["dna_ins"] = function $dna_ins() {
                 return this._rule("dna", false, [], null, this["dna"]);
             });
         });
-    }, true) && (alt = this._getIntermediate(), true) && this._exec(elements.NARefAlt({
+    }, true) && (alt = this._getIntermediate(), true) && this._exec(new elements.NARefAlt({
         ref: null,
         alt: ref
     }));
@@ -555,7 +524,7 @@ HGVS.prototype["dna_dup"] = function $dna_dup() {
                 return this._rule("dna", false, [], null, this["dna"]);
             });
         });
-    }, true) && (ref = this._getIntermediate(), true) && this._exec(elements.Dup({
+    }, true) && (ref = this._getIntermediate(), true) && this._exec(new elements.Dup({
         ref: ref
     }));
 };
@@ -574,14 +543,14 @@ HGVS.prototype["dna_inv"] = function $dna_inv() {
                 });
             });
         }, true);
-    })) && (ref = this._getIntermediate(), true) && this._exec(elements.Inv({
+    })) && (ref = this._getIntermediate(), true) && this._exec(new elements.Inv({
         ref: null
     }));
 };
 
 HGVS.prototype["dna_con"] = function $dna_con() {
     var pos;
-    return this._match("con") && this._rule("hgvs_position", false, [], null, this["hgvs_position"]) && (pos = this._getIntermediate(), true) && this._exec(elements.Conv({
+    return this._match("con") && this._rule("hgvs_position", false, [], null, this["hgvs_position"]) && (pos = this._getIntermediate(), true) && this._exec(new elements.Conv({
         from_ac: pos.ac,
         from_type: pos.type,
         from_pos: pos.pos
@@ -590,7 +559,7 @@ HGVS.prototype["dna_con"] = function $dna_con() {
 
 HGVS.prototype["dna_copy"] = function $dna_copy() {
     var n;
-    return this._match("copy") && this._rule("num", false, [], null, this["num"]) && (n = this._getIntermediate(), true) && this._exec(elements.NACopy({
+    return this._match("copy") && this._rule("num", false, [], null, this["num"]) && (n = this._getIntermediate(), true) && this._exec(new elements.NACopy({
         copy: n
     }));
 };
@@ -632,7 +601,7 @@ HGVS.prototype["rna_ident"] = function $rna_ident() {
                 return this._rule("rna", false, [], null, this["rna"]);
             });
         });
-    }, true) && (ref = this._getIntermediate(), true) && this._match("=") && this._exec(elements.NARefAlt({
+    }, true) && (ref = this._getIntermediate(), true) && this._match("=") && this._exec(new elements.NARefAlt({
         ref: ref,
         alt: ref
     }));
@@ -640,7 +609,7 @@ HGVS.prototype["rna_ident"] = function $rna_ident() {
 
 HGVS.prototype["rna_subst"] = function $rna_subst() {
     var ref, alt;
-    return this._rule("rna", false, [], null, this["rna"]) && (ref = this._getIntermediate(), true) && this._match(">") && this._rule("rna", false, [], null, this["rna"]) && (alt = this._getIntermediate(), true) && this._exec(elements.NARefAlt({
+    return this._rule("rna", false, [], null, this["rna"]) && (ref = this._getIntermediate(), true) && this._match(">") && this._rule("rna", false, [], null, this["rna"]) && (alt = this._getIntermediate(), true) && this._exec(new elements.NARefAlt({
         ref: ref,
         alt: alt
     }));
@@ -666,7 +635,7 @@ HGVS.prototype["rna_delins"] = function $rna_delins() {
                 return this._rule("rna", false, [], null, this["rna"]);
             });
         });
-    }, true) && (alt = this._getIntermediate(), true) && this._exec(elements.NARefAlt({
+    }, true) && (alt = this._getIntermediate(), true) && this._exec(new elements.NARefAlt({
         ref: ref,
         alt: alt
     }));
@@ -686,7 +655,7 @@ HGVS.prototype["rna_del"] = function $rna_del() {
                 });
             });
         }, true);
-    })) && (ref = this._getIntermediate(), true) && this._exec(elements.NARefAlt({
+    })) && (ref = this._getIntermediate(), true) && this._exec(new elements.NARefAlt({
         ref: ref,
         alt: null
     }));
@@ -700,7 +669,7 @@ HGVS.prototype["rna_ins"] = function $rna_ins() {
                 return this._rule("rna", false, [], null, this["rna"]);
             });
         });
-    }, true) && (alt = this._getIntermediate(), true) && this._exec(elements.NARefAlt({
+    }, true) && (alt = this._getIntermediate(), true) && this._exec(new elements.NARefAlt({
         ref: null,
         alt: alt
     }));
@@ -714,7 +683,7 @@ HGVS.prototype["rna_dup"] = function $rna_dup() {
                 return this._rule("rna", false, [], null, this["rna"]);
             });
         });
-    }, true) && (ref = this._getIntermediate(), true) && this._exec(elements.Dup({
+    }, true) && (ref = this._getIntermediate(), true) && this._exec(new elements.Dup({
         ref: ref
     }));
 };
@@ -733,14 +702,14 @@ HGVS.prototype["rna_inv"] = function $rna_inv() {
                 });
             });
         }, true);
-    })) && (ref = this._getIntermediate(), true) && this._exec(elements.Inv({
+    })) && (ref = this._getIntermediate(), true) && this._exec(new elements.Inv({
         ref: null
     }));
 };
 
 HGVS.prototype["rna_con"] = function $rna_con() {
     var pos;
-    return this._match("con") && this._rule("hgvs_position", false, [], null, this["hgvs_position"]) && (pos = this._getIntermediate(), true) && this._exec(elements.Conv({
+    return this._match("con") && this._rule("hgvs_position", false, [], null, this["hgvs_position"]) && (pos = this._getIntermediate(), true) && this._exec(new elements.Conv({
         from_ac: pos.ac,
         from_type: pos.type,
         from_pos: pos.pos
@@ -780,7 +749,7 @@ HGVS.prototype["pro_subst"] = function $pro_subst() {
     var alt;
     return (this._atomic(function() {
         return this._rule("aat13", false, [], null, this["aat13"]);
-    }) || this._match("?")) && (alt = this._getIntermediate(), true) && this._exec(elements.AASub({
+    }) || this._match("?")) && (alt = this._getIntermediate(), true) && this._exec(new elements.AASub({
         ref: "",
         alt: alt
     }));
@@ -788,14 +757,14 @@ HGVS.prototype["pro_subst"] = function $pro_subst() {
 
 HGVS.prototype["pro_delins"] = function $pro_delins() {
     var alt;
-    return this._match("delins") && this._rule("aat13_seq", false, [], null, this["aat13_seq"]) && (alt = this._getIntermediate(), true) && this._exec(elements.AASub({
+    return this._match("delins") && this._rule("aat13_seq", false, [], null, this["aat13_seq"]) && (alt = this._getIntermediate(), true) && this._exec(new elements.AASub({
         ref: "",
         alt: alt
     }));
 };
 
 HGVS.prototype["pro_del"] = function $pro_del() {
-    return this._match("del") && this._exec(elements.AASub({
+    return this._match("del") && this._exec(new elements.AASub({
         ref: "",
         alt: alt
     }));
@@ -803,14 +772,14 @@ HGVS.prototype["pro_del"] = function $pro_del() {
 
 HGVS.prototype["pro_ins"] = function $pro_ins() {
     var alt;
-    return this._match("ins") && this._rule("aat13_seq", false, [], null, this["aat13_seq"]) && (alt = this._getIntermediate(), true) && this._exec(elements.AASub({
+    return this._match("ins") && this._rule("aat13_seq", false, [], null, this["aat13_seq"]) && (alt = this._getIntermediate(), true) && this._exec(new elements.AASub({
         ref: null,
         alt: alt
     }));
 };
 
 HGVS.prototype["pro_dup"] = function $pro_dup() {
-    return this._match("dup") && this._exec(elements.Dup({
+    return this._match("dup") && this._exec(new elements.Dup({
         ref: ""
     }));
 };
@@ -821,7 +790,7 @@ HGVS.prototype["pro_fs"] = function $pro_fs() {
         return this._rule("aat13", false, [], null, this["aat13"]);
     }) || this._atomic(function() {
         return this._exec("");
-    })) && (alt = this._getIntermediate(), true) && this._rule("fs", false, [], null, this["fs"]) && (length = this._getIntermediate(), true) && this._exec(elements.AAFs({
+    })) && (alt = this._getIntermediate(), true) && this._rule("fs", false, [], null, this["fs"]) && (length = this._getIntermediate(), true) && this._exec(new elements.AAFs({
         ref: "",
         alt: alt,
         length: length
@@ -832,7 +801,7 @@ HGVS.prototype["pro_ext"] = function $pro_ext() {
     var alt, ext;
     return this._optional(function() {
         return this._rule("aat13", false, [], null, this["aat13"]);
-    }) && (alt = this._getIntermediate(), true) && this._rule("ext", false, [], null, this["ext"]) && (ext = this._getIntermediate(), true) && this._exec(elements.AAExt({
+    }) && (alt = this._getIntermediate(), true) && this._rule("ext", false, [], null, this["ext"]) && (ext = this._getIntermediate(), true) && this._exec(new elements.AAExt({
         ref: "",
         alt: alt,
         aaterm: ext.aaterm,
@@ -841,7 +810,7 @@ HGVS.prototype["pro_ext"] = function $pro_ext() {
 };
 
 HGVS.prototype["pro_ident"] = function $pro_ident() {
-    return this._match("=") && this._exec(elements.AARefAlt({
+    return this._match("=") && this._exec(new elements.AARefAlt({
         ref: "",
         alt: ""
     }));
@@ -904,90 +873,72 @@ HGVS.prototype["r_interval"] = function $r_interval() {
 HGVS.prototype["def_g_interval"] = function $def_g_interval() {
     var start, end, start;
     return this._atomic(function() {
-        return this._rule("g_pos", false, [], null, this["g_pos"]) && (start = this._getIntermediate(), true) && this._match("_") && this._rule("g_pos", false, [], null, this["g_pos"]) && (end = this._getIntermediate(), true) && this._exec(elements.Interval({
+        return this._rule("g_pos", false, [], null, this["g_pos"]) && (start = this._getIntermediate(), true) && this._match("_") && this._rule("g_pos", false, [], null, this["g_pos"]) && (end = this._getIntermediate(), true) && this._exec(new elements.Interval({
             start: start,
             end: end
         }));
     }) || this._atomic(function() {
-        return this._rule("g_pos", false, [], null, this["g_pos"]) && (start = this._getIntermediate(), true) && this._exec(elements.Interval({
-            start: start,
-            end: elements.deepcopy(start)
-        }));
+        return this._rule("g_pos", false, [], null, this["g_pos"]) && (start = this._getIntermediate(), true) && this._exec(start);
     });
 };
 
 HGVS.prototype["def_m_interval"] = function $def_m_interval() {
     var start, end, start;
     return this._atomic(function() {
-        return this._rule("m_pos", false, [], null, this["m_pos"]) && (start = this._getIntermediate(), true) && this._match("_") && this._rule("m_pos", false, [], null, this["m_pos"]) && (end = this._getIntermediate(), true) && this._exec(elements.Interval({
+        return this._rule("m_pos", false, [], null, this["m_pos"]) && (start = this._getIntermediate(), true) && this._match("_") && this._rule("m_pos", false, [], null, this["m_pos"]) && (end = this._getIntermediate(), true) && this._exec(new elements.Interval({
             start: start,
             end: end
         }));
     }) || this._atomic(function() {
-        return this._rule("m_pos", false, [], null, this["m_pos"]) && (start = this._getIntermediate(), true) && this._exec(elements.Interval({
-            start: start,
-            end: elements.deepcopy(start)
-        }));
+        return this._rule("m_pos", false, [], null, this["m_pos"]) && (start = this._getIntermediate(), true) && this._exec(start);
     });
 };
 
 HGVS.prototype["def_p_interval"] = function $def_p_interval() {
     var start, end, start;
     return this._atomic(function() {
-        return this._rule("p_pos", false, [], null, this["p_pos"]) && (start = this._getIntermediate(), true) && this._match("_") && this._rule("p_pos", false, [], null, this["p_pos"]) && (end = this._getIntermediate(), true) && this._exec(elements.Interval({
+        return this._rule("p_pos", false, [], null, this["p_pos"]) && (start = this._getIntermediate(), true) && this._match("_") && this._rule("p_pos", false, [], null, this["p_pos"]) && (end = this._getIntermediate(), true) && this._exec(new elements.Interval({
             start: start,
             end: end
         }));
     }) || this._atomic(function() {
-        return this._rule("p_pos", false, [], null, this["p_pos"]) && (start = this._getIntermediate(), true) && this._exec(elements.Interval({
-            start: start,
-            end: elements.deepcopy(start)
-        }));
+        return this._rule("p_pos", false, [], null, this["p_pos"]) && (start = this._getIntermediate(), true) && this._exec(start);
     });
 };
 
 HGVS.prototype["def_r_interval"] = function $def_r_interval() {
     var start, end, start;
     return this._atomic(function() {
-        return this._rule("r_pos", false, [], null, this["r_pos"]) && (start = this._getIntermediate(), true) && this._match("_") && this._rule("r_pos", false, [], null, this["r_pos"]) && (end = this._getIntermediate(), true) && this._exec(elements.Interval({
+        return this._rule("r_pos", false, [], null, this["r_pos"]) && (start = this._getIntermediate(), true) && this._match("_") && this._rule("r_pos", false, [], null, this["r_pos"]) && (end = this._getIntermediate(), true) && this._exec(new elements.Interval({
             start: start,
             end: end
         }));
     }) || this._atomic(function() {
-        return this._rule("r_pos", false, [], null, this["r_pos"]) && (start = this._getIntermediate(), true) && this._exec(elements.Interval({
-            start: start,
-            end: elements.deepcopy(start)
-        }));
+        return this._rule("r_pos", false, [], null, this["r_pos"]) && (start = this._getIntermediate(), true) && this._exec(start);
     });
 };
 
 HGVS.prototype["def_c_interval"] = function $def_c_interval() {
     var start, end, start;
     return this._atomic(function() {
-        return this._rule("c_pos", false, [], null, this["c_pos"]) && (start = this._getIntermediate(), true) && this._match("_") && this._rule("c_pos", false, [], null, this["c_pos"]) && (end = this._getIntermediate(), true) && this._exec(elements.BaseInterval({
+        return this._rule("c_pos", false, [], null, this["c_pos"]) && (start = this._getIntermediate(), true) && this._match("_") && this._rule("c_pos", false, [], null, this["c_pos"]) && (end = this._getIntermediate(), true) && this._exec(new elements.BaseInterval({
             start: start,
             end: end
         }));
     }) || this._atomic(function() {
-        return this._rule("c_pos", false, [], null, this["c_pos"]) && (start = this._getIntermediate(), true) && this._exec(elements.BaseOffsetInterval({
-            start: start,
-            end: elements.deepcopy(start)
-        }));
+        return this._rule("c_pos", false, [], null, this["c_pos"]) && (start = this._getIntermediate(), true) && this._exec(start);
     });
 };
 
 HGVS.prototype["def_n_interval"] = function $def_n_interval() {
     var start, end, start;
     return this._atomic(function() {
-        return this._rule("n_pos", false, [], null, this["n_pos"]) && (start = this._getIntermediate(), true) && this._match("_") && this._rule("n_pos", false, [], null, this["n_pos"]) && (end = this._getIntermediate(), true) && this._exec(elements.BaseInterval({
+        return this._rule("n_pos", false, [], null, this["n_pos"]) && (start = this._getIntermediate(), true) && this._match("_") && this._rule("n_pos", false, [], null, this["n_pos"]) && (end = this._getIntermediate(), true) && this._exec(new elements.BaseInterval({
             start: start,
             end: end
         }));
     }) || this._atomic(function() {
-        return this._rule("n_pos", false, [], null, this["n_pos"]) && (start = this._getIntermediate(), true) && this._exec(elements.BaseOffsetInterval({
-            start: start,
-            end: elements.deepcopy(start)
-        }));
+        return this._rule("n_pos", false, [], null, this["n_pos"]) && (start = this._getIntermediate(), true) && this._exec(start);
     });
 };
 
@@ -1048,14 +999,14 @@ HGVS.prototype["r_pos"] = function $r_pos() {
 HGVS.prototype["def_c_pos"] = function $def_c_pos() {
     return this._atomic(function() {
         var b, o;
-        return this._rule("base", false, [], null, this["base"]) && (b = this._getIntermediate(), true) && this._rule("offset", false, [], null, this["offset"]) && (o = this._getIntermediate(), true) && this._exec(elements.BaseOffsetPosition({
+        return this._rule("base", false, [], null, this["base"]) && (b = this._getIntermediate(), true) && this._rule("offset", false, [], null, this["offset"]) && (o = this._getIntermediate(), true) && this._exec(new elements.BaseOffsetPosition({
             base: b,
             offset: o,
             datum: constants.CDS_START
         }));
     }) || this._atomic(function() {
         var b, o;
-        return this._match("*") && this._rule("num", false, [], null, this["num"]) && (b = this._getIntermediate(), true) && this._rule("offset", false, [], null, this["offset"]) && (o = this._getIntermediate(), true) && this._exec(elements.BaseOffsetPosition({
+        return this._match("*") && this._rule("num", false, [], null, this["num"]) && (b = this._getIntermediate(), true) && this._rule("offset", false, [], null, this["offset"]) && (o = this._getIntermediate(), true) && this._exec(new elements.BaseOffsetPosition({
             base: b,
             offset: o,
             datum: constants.CDS_END
@@ -1069,7 +1020,7 @@ HGVS.prototype["def_g_pos"] = function $def_g_pos() {
         return this._rule("num", false, [], null, this["num"]);
     }) || this._atomic(function() {
         return this._match("?") && this._exec(null);
-    })) && (pos = this._getIntermediate(), true) && this._exec(elements.SimplePosition(pos));
+    })) && (pos = this._getIntermediate(), true) && this._exec(pos);
 };
 
 HGVS.prototype["def_m_pos"] = function $def_m_pos() {
@@ -1078,12 +1029,12 @@ HGVS.prototype["def_m_pos"] = function $def_m_pos() {
         return this._rule("num", false, [], null, this["num"]);
     }) || this._atomic(function() {
         return this._match("?") && this._exec(null);
-    })) && (pos = this._getIntermediate(), true) && this._exec(elements.SimplePosition(pos));
+    })) && (pos = this._getIntermediate(), true) && this._exec(pos);
 };
 
 HGVS.prototype["def_n_pos"] = function $def_n_pos() {
     var b, o;
-    return this._rule("base", false, [], null, this["base"]) && (b = this._getIntermediate(), true) && this._rule("offset", false, [], null, this["offset"]) && (o = this._getIntermediate(), true) && this._exec(elements.BaseOffsetPosition({
+    return this._rule("base", false, [], null, this["base"]) && (b = this._getIntermediate(), true) && this._rule("offset", false, [], null, this["offset"]) && (o = this._getIntermediate(), true) && this._exec(new elements.BaseOffsetPosition({
         base: b,
         offset: o,
         datum: constants.SEQ_START
@@ -1096,7 +1047,7 @@ HGVS.prototype["def_p_pos"] = function $def_p_pos() {
         return this._rule("term13", false, [], null, this["term13"]);
     }) || this._atomic(function() {
         return this._rule("aa13", false, [], null, this["aa13"]);
-    })) && (aa = this._getIntermediate(), true) && this._rule("num", false, [], null, this["num"]) && (pos = this._getIntermediate(), true) && this._exec(elements.AAPosition({
+    })) && (aa = this._getIntermediate(), true) && this._rule("num", false, [], null, this["num"]) && (pos = this._getIntermediate(), true) && this._exec(new elements.AAPosition({
         base: pos,
         aa: aa_to_aa1(aa)
     }));
@@ -1104,7 +1055,7 @@ HGVS.prototype["def_p_pos"] = function $def_p_pos() {
 
 HGVS.prototype["def_r_pos"] = function $def_r_pos() {
     var b, o;
-    return this._rule("base", false, [], null, this["base"]) && (b = this._getIntermediate(), true) && this._rule("offset", false, [], null, this["offset"]) && (o = this._getIntermediate(), true) && this._exec(elements.BaseOffsetPosition({
+    return this._rule("base", false, [], null, this["base"]) && (b = this._getIntermediate(), true) && this._rule("offset", false, [], null, this["offset"]) && (o = this._getIntermediate(), true) && this._exec(new elements.BaseOffsetPosition({
         base: b,
         offset: o,
         datum: constants.SEQ_START
