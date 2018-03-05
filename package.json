@@ -1,11 +1,12 @@
 {
-  "name": "hgvs",
+  "name": "hgvsjs",
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
   "scripts": {
     "test": "yarn build && jest",
-    "build": "ometajs2js -b -i src/hgvs.ometa -o src/hgvs.js"
+    "build": "ometajs2js -b -i src/svn.ometa -o src/svn.js",
+    "lint": "eslint src/**/*.js test/**/*.js"
   },
   "author": "",
   "license": "UNLICENSED",
@@ -15,9 +16,12 @@
   },
   "devDependencies": {
     "babel-core": "^6.26.0",
+    "babel-eslint": "^8.2.2",
     "babel-jest": "^22.4.1",
     "babel-preset-env": "^1.6.1",
     "babel-preset-stage-3": "^6.24.1",
+    "eslint": "^4.18.2",
+    "eslint-plugin-jest": "^21.12.3",
     "jest": "^22.4.2",
     "jest-plugin-context": "^2.7.0",
     "regenerator-runtime": "^0.11.1"
