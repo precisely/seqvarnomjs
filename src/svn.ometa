@@ -29,13 +29,15 @@ ometa SVN {
   rSeqVariant = accn:ac ':' 'r':type '.' rSimpleVariant:variant -> new elements.SequenceVariant({ac:ac, type:type, variant:variant}),
 
   // SeqVariantPattern
-  svnVariantPattern = cSeqVariantPattern | gSeqVariantPattern,
-  cSeqVariantSubPattern = accn:ac ':' 'c':type '.' (cUnphasedVariantPattern | cTransVariantPattern | cCisVariantPattern | cSimpleVariantPattern):variant,
+  svnVariantPattern = logicPattern(#svnVariantPatternTypes),
+  svnVariantPatternTypes = cSeqVariantSubPattern | gSeqVariantSubPattern,
+  cSeqVariantSubPattern = accn:ac ':' 'c':type '.' logicPattern(#cSequenceVariantPatternVariantPattern):variant
                         -> new elements.SequenceVariantPattern({ac:ac, type:type, variant:variant}),
-  gSeqVariantSubPattern = accn:ac ':' 'g':type '.' (gUnphasedVariantPattern | gTransVariantPattern | gCisVariantPattern | gSimpleVariantPattern),
+  gSeqVariantSubPattern = accn:ac ':' 'g':type '.' logicPattern(#gSequenceVariantPatternVariantPattern):variant
                         -> new elements.SequenceVariantPattern({ac:ac, type:type, variant:variant}),
-  cSeqVariantPattern = logicPattern(#cSeqVariantPattern, #cSeqVariantSubPattern),
-  gSeqVariantPattern = logicPattern(#gSeqVariantPattern, #gSeqVariantSubPattern),
+
+  cSequenceVariantPatternVariantPattern = (cUnphasedVariantPattern | cTransVariantPattern | cCisVariantPattern | cSimpleVariantPattern),
+  gSequenceVariantPatternVariantPattern = (gUnphasedVariantPattern | gTransVariantPattern | gCisVariantPattern | gSimpleVariantPattern),
 
   ////////////////////////////////////////////////////////////////////////////
   // HGVS Edit (without accession); e.g., c.76+3A>T
@@ -66,14 +68,18 @@ ometa SVN {
   rHgvsPosition = accn:ac ':' 'r':type '.' rInterval:pos -> new elements.HGVSPosition({ac:ac, type:type, pos:post}),
 
   ////////////////////////////////////////////////////////////////////////////
+  // VariantPattern
+  cVariantPatternType = cUnphasedVariantPattern | cPhasedVariantPattern
+
+  ////////////////////////////////////////////////////////////////////////////
   // UnphasedVariant - phased(;)phased(;)phased...
 
   cUnphasedVariant = listOf(#cPhasedVariants, '(;)'):phasedVariants ?(phasedVariants.length>1) -> new elements.UnphasedVariant({variants:phasedVariants}),
   gUnphasedVariant = listOf(#gPhasedVariants, '(;)'):phasedVariants ?(phasedVariants.length>1) -> new elements.UnphasedVariant({variants:phasedVariants}),
 
   // UnphasedVariantPattern
-  cUnphasedVariantPattern = logicPattern(#cUnphasedVariantPattern, #cPhasedVariantPattern),
-  gUnphasedVariantPattern = logicPattern(#gUnphasedVariantPattern, #gPhasedVariantPattern),
+  cUnphasedVariantPattern = logicPattern(#cPhasedVariantPattern),
+  gUnphasedVariantPattern = logicPattern(#gPhasedVariantPattern),
 
   ////////////////////////////////////////////////////////////////////////////
   // PhasedVariants - trans or cis cisVariants
@@ -92,8 +98,8 @@ ometa SVN {
   gTransVariant = listOf(#gCisVariant, ';'):cisVariants ?(cisVariants.length>1) -> new elements.TransVariant({variants:cisVariants}),
 
   // TransVariant Patterns
-  cTransVariantPattern = logicPattern(#cTransVariantPattern, #cCisVariantPattern),
-  gTransVariantPattern = logicPattern(#gTransVariantPattern, #gCisVariantPattern),
+  cTransVariantPattern = logicPattern(#cCisVariantPattern),
+  gTransVariantPattern = logicPattern(#gCisVariantPattern),
 
   ////////////////////////////////////////////////////////////////////////////
   // CisVariant (aka allele) - [edit;edit;edit] edits are in cis
@@ -108,8 +114,8 @@ ometa SVN {
   // CisVariant Patterns
   cCisVariantSubPattern = cisBracketPattern(#cSimpleVariantPattern),
   gCisVariantSubPattern = cisBracketPattern(#gSimpleVariantPattern),
-  cCisVariantPattern = logicPattern(#cCisVariantPattern, #cCisVariantSubPattern),
-  gCisVariantPattern = logicPattern(#gCisVariantPattern, #gCisVariantSubPattern),
+  cCisVariantPattern = logicPattern(#cCisVariantSubPattern),
+  gCisVariantPattern = logicPattern(#gCisVariantSubPattern),
 
   ////////////////////////////////////////////////////////////////////////////
   // SimpleVariant a single position with an optional edit (ref=>alt change)

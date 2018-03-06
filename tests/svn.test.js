@@ -225,7 +225,7 @@ describe('svn.ometa', function () {
     });
   });
 
-  context('Patterns', function () {
+  context('Logic Patterns', function () {
     it('should parse a SimpleVariant OR pattern', function () {
       var result = SVN.matchAll('111A>T^222C>G', 'gSimpleVariantPattern');
       expect(result).toBeInstanceOf(OrExpr);
@@ -284,5 +284,17 @@ describe('svn.ometa', function () {
       expect(result.expression).toBeInstanceOf(SimpleVariant);
     });
 
+    context('Building a Variant Pattern',  function () {
+
+    });
+
+    context('Building a SequenceVariantPattern', function () {
+      it('should return a SequenceVariantPattern', function () {
+        var result = SVN.matchAll('NC0001_01.11:g.[111A>T^222G>C]', 'svnVariantPattern');
+        expect(result).toBeInstanceOf(SequenceVariantPattern);
+        expect(result.variant).toBeInstanceOf(OrExpr);
+        expect(result.variant.expressions).toHaveLength(2);
+      });
+    });
   });
 });

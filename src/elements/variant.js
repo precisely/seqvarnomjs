@@ -23,7 +23,7 @@ export class SequenceVariant {
   }
 }
 
-export class SequenceVariantPattern extends SequenceVariant { }
+export class SequenceVariantPattern extends SequenceVariant {}
 
 function findMatchInArray(array, pattern) {
   return array.some(elt=>elt.match(pattern));
