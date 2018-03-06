@@ -27,7 +27,7 @@ export class NARefAlt extends Edit {
   }
 }
 
-
+// duplicate
 export class Dup extends Edit {
   constructor({ ref:ref, uncertain:uncertain }) {
     super();
@@ -44,6 +44,7 @@ export class Dup extends Edit {
   }
 }
 
+// inversion
 export class Inv extends Edit {
   constructor({ ref }) {
     super();
@@ -55,6 +56,8 @@ export class Inv extends Edit {
   }
 }
 
+// amino acid change - unlike NARefAlt, the ref amino acid
+//    in a protein substitution is part of the location
 export class AARefAlt extends Edit {
   constructor({ ref, alt }) {
     super();
@@ -81,12 +84,14 @@ export class AARefAlt extends Edit {
   }
 }
 
+// amino acid substitution
 export class AASub extends AARefAlt {
   type() {
     return 'sub';
   }
 }
 
+// amino acid extension
 export class AAExt extends Edit {
   constructor({ ref, alt, aaterm, length, uncertain }) {
     super();
@@ -98,6 +103,14 @@ export class AAExt extends Edit {
   }
 }
 
+/**
+ * Class representing an amino acid frameshift mutation
+ *
+ *
+ * @export
+ * @class AAFs
+ * @extends {Edit}
+ */
 export class AAFs extends Edit {
   constructor({ ref, alt, length, uncertain }) {
     super();
@@ -116,6 +129,15 @@ export class AAFs extends Edit {
   }
 }
 
+/**
+ * Class representing a conversion
+ * http://varnomen.hgvs.org/recommendations/DNA/variant/conversion/
+ * E.g., NC_000022.10:g.42522624_42522669con42536337_42536382
+ *
+ * @export
+ * @class Conv
+ * @extends {Edit}
+ */
 export class Conv extends Edit {
   constructor({ fromAc, fromType, fromPos }) {
     super();

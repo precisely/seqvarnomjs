@@ -1,5 +1,6 @@
 var elements = require('./elements');
 var constants = require('./constants');
+
 ometa SVN {
   // This file describes an OMeta grammar for a subset of the HGVS
   // variant specification.  The subset is limited to is limited to those
@@ -13,9 +14,8 @@ ometa SVN {
   // one of many kinds of variants, simpleVariant, cisVariant,
   // transVariant, unphasedVariant
 
-
   ////////////////////////////////////////////////////////////////////////////
-  // HGVS Sequence Variant Nomenclature
+  // SequenceVariant - an accession number, a type and a variant
 
   svnVariant = gSeqVariant | mSeqVariant | cSeqVariant | nSeqVariant  | rSeqVariant | pSeqVariant,
 
@@ -27,6 +27,15 @@ ometa SVN {
   nSeqVariant = accn:ac ':' 'n':type '.' nSimpleVariant:variant -> new elements.SequenceVariant({ac:ac, type:type, variant:variant}),
   pSeqVariant = accn:ac ':' 'p':type '.' pSimpleVariant:variant -> new elements.SequenceVariant({ac:ac, type:type, variant:variant}),
   rSeqVariant = accn:ac ':' 'r':type '.' rSimpleVariant:variant -> new elements.SequenceVariant({ac:ac, type:type, variant:variant}),
+
+  // SeqVariantPattern
+  svnVariantPattern = cSeqVariantPattern | gSeqVariantPattern,
+  cSeqVariantSubPattern = accn:ac ':' 'c':type '.' (cUnphasedVariantPattern | cTransVariantPattern | cCisVariantPattern | cSimpleVariantPattern):variant,
+                        -> new elements.SequenceVariantPattern({ac:ac, type:type, variant:variant}),
+  gSeqVariantSubPattern = accn:ac ':' 'g':type '.' (gUnphasedVariantPattern | gTransVariantPattern | gCisVariantPattern | gSimpleVariantPattern),
+                        -> new elements.SequenceVariantPattern({ac:ac, type:type, variant:variant}),
+  cSeqVariantPattern = logicPattern(#cSeqVariantPattern, #cSeqVariantSubPattern),
+  gSeqVariantPattern = logicPattern(#gSeqVariantPattern, #gSeqVariantSubPattern),
 
   ////////////////////////////////////////////////////////////////////////////
   // HGVS Edit (without accession); e.g., c.76+3A>T
@@ -58,22 +67,37 @@ ometa SVN {
 
   ////////////////////////////////////////////////////////////////////////////
   // UnphasedVariant - phased(;)phased(;)phased...
+
   cUnphasedVariant = listOf(#cPhasedVariants, '(;)'):phasedVariants ?(phasedVariants.length>1) -> new elements.UnphasedVariant({variants:phasedVariants}),
   gUnphasedVariant = listOf(#gPhasedVariants, '(;)'):phasedVariants ?(phasedVariants.length>1) -> new elements.UnphasedVariant({variants:phasedVariants}),
 
+  // UnphasedVariantPattern
+  cUnphasedVariantPattern = logicPattern(#cUnphasedVariantPattern, #cPhasedVariantPattern),
+  gUnphasedVariantPattern = logicPattern(#gUnphasedVariantPattern, #gPhasedVariantPattern),
 
   ////////////////////////////////////////////////////////////////////////////
-  // PhasedAlleles - trans or cis cisVariants
+  // PhasedVariants - trans or cis cisVariants
+
   cPhasedVariants = cTransVariant | cCisVariant,
   gPhasedVariants = gTransVariant | gCisVariant,
 
+  // PhasedVariant Patterns
+  cPhasedVariantPattern = cTransVariantPattern | cCisVariantPattern,
+  gPhasedVariantPattern = gTransVariantPattern | gCisVariantPattern,
+
   ////////////////////////////////////////////////////////////////////////////
   // TransVariant - cisVariant;cisVariant;cisVariant... edits are in trans
+
   cTransVariant = listOf(#cCisVariant, ';'):cisVariants ?(cisVariants.length>1) -> new elements.TransVariant({variants:cisVariants})),
   gTransVariant = listOf(#gCisVariant, ';'):cisVariants ?(cisVariants.length>1) -> new elements.TransVariant({variants:cisVariants}),
 
+  // TransVariant Patterns
+  cTransVariantPattern = logicPattern(#cTransVariantPattern, #cCisVariantPattern),
+  gTransVariantPattern = logicPattern(#gTransVariantPattern, #gCisVariantPattern),
+
   ////////////////////////////////////////////////////////////////////////////
-  // CisVariant (aka alleles) - [edit;edit;edit] edits are in cis
+  // CisVariant (aka allele) - [edit;edit;edit] edits are in cis
+
   cisBracketPattern :elt =
       ('[' listOf(elt,';'):edits ?(edits.length===1) ']' -> edits[0])
     | ('[' listOf(elt,';'):edits ?(edits.length>1) ']' -> new elements.CisVariant({variants:edits})),
@@ -81,16 +105,15 @@ ometa SVN {
   cCisVariant = cisBracketPattern(#cSimpleVariant),
   gCisVariant = cisBracketPattern(#gSimpleVariant),
 
-  ////////////////////////////////////////////////////////////////////////////
-  // UnphasedVariant - phased(;)phased(;)phased...
-
-  cUnphasedVariant = listOf(#cPhasedVariants, '(;)'):cisVariants ?(cisVariants.length>1) -> new elements.UnphasedVariant({variants:cisVariants}),
-  gUnphasedVariant = listOf(#gPhasedVariants, '(;)'):cisVariants ?(cisVariants.length>1) -> new elements.UnphasedVariant({variants:cisVariants}),
+  // CisVariant Patterns
+  cCisVariantSubPattern = cisBracketPattern(#cSimpleVariantPattern),
+  gCisVariantSubPattern = cisBracketPattern(#gSimpleVariantPattern),
+  cCisVariantPattern = logicPattern(#cCisVariantPattern, #cCisVariantSubPattern),
+  gCisVariantPattern = logicPattern(#gCisVariantPattern, #gCisVariantSubPattern),
 
   ////////////////////////////////////////////////////////////////////////////
   // SimpleVariant a single position with an optional edit (ref=>alt change)
   //               simple variant with a null edit indicates the reference sequence was found
-
   cSimpleVariant = cInterval:pos dnaEdit:edit -> new elements.SimpleVariant({pos:pos,edit:edit}),
   gSimpleVariant = gInterval:pos dnaEdit:edit -> new elements.SimpleVariant({pos:pos,edit:edit}),
   mSimpleVariant = mInterval:pos dnaEdit:edit -> new elements.SimpleVariant({pos:pos,edit:edit}),
@@ -108,6 +131,26 @@ ometa SVN {
     | '0':x -> new elements.SimpleVariant({pos:null, edit:x, uncertain:false})
     | '?':x -> null,
 
+  // SimpleVariant Patterns
+  cSimpleVariantPattern = logicPattern(#cSimpleVariant),
+  gSimpleVariantPattern = logicPattern(#gSimpleVariant),
+
+  ////////////////////////////////////////////////////////////////////////////
+  // LogicPatterns -- allows and, or, not matching and logical grouping
+
+  logicExpr :pattern = apply(pattern):expr | anything:expr ?(elements.isLogicExpr(expr, pattern)) -> expr,
+  logicExprList :pattern :sep =
+      listOf(pattern, sep):exprs ?(exprs.length>1) -> exprs
+    | (logicExpr(pattern):expr1 char:c ?(c===sep) logicPattern(pattern):expr2 -> [expr1, expr2]),
+  maybeBracedPatternList :pattern :sep = logicExprList(pattern, sep) | ('{' logicExprList(pattern, sep):exprs '}' -> exprs),
+  maybeBracedPattern :pattern = apply(pattern) | ('{' (apply(pattern) | empty):expr '}' -> expr),
+
+  andPattern :pattern = maybeBracedPatternList(pattern, '&'):exprs -> new elements.AndExpr(exprs, pattern),
+  orPattern :pattern = maybeBracedPatternList(pattern, '^'):exprs -> new elements.OrExpr(exprs, pattern),
+  notPattern :pattern = '!' (logicExpr(pattern) | logicPattern(pattern)):expr -> new elements.NotExpr(expr, pattern),
+
+  logicPattern :pattern = andPattern(pattern) | orPattern(pattern) | notPattern(pattern)
+                        | maybeBracedPattern(pattern) | ('{' logicPattern(pattern):expr '}' -> expr),
 
   ////////////////////////////////////////////////////////////////////////////
   // Edits -- sequence-specific operations at a position

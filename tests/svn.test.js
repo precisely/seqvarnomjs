@@ -1,6 +1,6 @@
 import { SVN } from 'src/svn';
 import { SequenceVariant, TransVariant, NARefAlt } from 'src/elements';
-import { UnphasedVariant, CisVariant, SimpleVariant } from '../src/elements';
+import { UnphasedVariant, CisVariant, SimpleVariant, SequenceVariantPattern, OrExpr, AndExpr, NotExpr } from '../src/elements';
 
 describe('svn.ometa', function () {
   it('should read a simple nucleic acid variant', function () {
@@ -223,5 +223,66 @@ describe('svn.ometa', function () {
       var gResult = SVN.matchAll('[123T>C;345A>G]', 'gCisVariant');
       expect(gResult).toBeInstanceOf(CisVariant);
     });
+  });
+
+  context('Patterns', function () {
+    it('should parse a SimpleVariant OR pattern', function () {
+      var result = SVN.matchAll('111A>T^222C>G', 'gSimpleVariantPattern');
+      expect(result).toBeInstanceOf(OrExpr);
+      expect(result.pattern).toEqual('gSimpleVariant');
+      expect(result.expressions).toHaveLength(2);
+      expect(result.expressions[0]).toBeInstanceOf(SimpleVariant);
+      expect(result.expressions[0]).toBeInstanceOf(SimpleVariant);
+    });
+
+    it('should parse a SimpleVariant AND pattern', function () {
+      var result = SVN.matchAll('111A>T&222C>G', 'gSimpleVariantPattern');
+      expect(result).toBeInstanceOf(AndExpr);
+      expect(result.pattern).toEqual('gSimpleVariant');
+      expect(result.expressions).toHaveLength(2);
+      expect(result.expressions[0]).toBeInstanceOf(SimpleVariant);
+      expect(result.expressions[0]).toBeInstanceOf(SimpleVariant);
+    });
+
+    it('should parse a SimpleVariant NOT pattern', function () {
+      var result = SVN.matchAll('!111A>T', 'gSimpleVariantPattern');
+      expect(result).toBeInstanceOf(NotExpr);
+      expect(result.pattern).toEqual('gSimpleVariant');
+      expect(result.expression).toBeInstanceOf(SimpleVariant);
+    });
+
+
+    it('should parse a SimpleVariant OR pattern with braces', function () {
+      var result = SVN.matchAll('{111A>T^222C>G}', 'gSimpleVariantPattern');
+      expect(result).toBeInstanceOf(OrExpr);
+      expect(result.pattern).toEqual('gSimpleVariant');
+      expect(result.expressions).toHaveLength(2);
+      expect(result.expressions[0]).toBeInstanceOf(SimpleVariant);
+      expect(result.expressions[0]).toBeInstanceOf(SimpleVariant);
+    });
+
+    it('should parse a SimpleVariant AND pattern with braces', function () {
+      var result = SVN.matchAll('{111A>T&222C>G}', 'gSimpleVariantPattern');
+      expect(result).toBeInstanceOf(AndExpr);
+      expect(result.pattern).toEqual('gSimpleVariant');
+      expect(result.expressions).toHaveLength(2);
+      expect(result.expressions[0]).toBeInstanceOf(SimpleVariant);
+      expect(result.expressions[0]).toBeInstanceOf(SimpleVariant);
+    });
+
+    it('should parse a SimpleVariant NOT pattern with surrounding braces', function () {
+      var result = SVN.matchAll('{!111A>T}', 'gSimpleVariantPattern');
+      expect(result).toBeInstanceOf(NotExpr);
+      expect(result.pattern).toEqual('gSimpleVariant');
+      expect(result.expression).toBeInstanceOf(SimpleVariant);
+    });
+
+    it('should parse a SimpleVariant NOT pattern with inner braces', function () {
+      var result = SVN.matchAll('!{111A>T}', 'gSimpleVariantPattern');
+      expect(result).toBeInstanceOf(NotExpr);
+      expect(result.pattern).toEqual('gSimpleVariant');
+      expect(result.expression).toBeInstanceOf(SimpleVariant);
+    });
+
   });
 });
