@@ -284,12 +284,48 @@ describe('svn.ometa', function () {
       expect(result.expression).toBeInstanceOf(SimpleVariant);
     });
 
-    context('Building a Variant Pattern',  function () {
-
+    it('should parse logic patterns in left=>right order', function () {
+      var result = SVN.matchAll('111A>T^222G>C&333T>C', 'gSimpleVariantPattern');
+      expect(result).toBeInstanceOf(OrExpr);
+      expect(result.pattern).toEqual('gSimpleVariant');
+      expect(result.expressions).toHaveLength(2);
+      var [lhs, rhs] = result.expressions;
+      expect(lhs).toBeInstanceOf(SimpleVariant);
+      expect(lhs.toString()).toEqual('111A>T');
+      expect(rhs).toBeInstanceOf(AndExpr);
+      expect(rhs.toString()).toEqual('222G>C&333T>C');
     });
 
+    it('should parse a SimpleVariant AND(OR) pattern', function () {
+      var result = SVN.matchAll('{111A>T^222G>C}&333T>C', 'gSimpleVariantPattern');
+      expect(result).toBeInstanceOf(AndExpr);
+      expect(result.pattern).toEqual('gSimpleVariant');
+      expect(result.expressions).toHaveLength(2);
+      var [lhs, rhs] = result.expressions;
+      expect(lhs).toBeInstanceOf(OrExpr);
+      expect(lhs.toString()).toEqual('111A>T^222G>C');
+      expect(rhs.toString()).toEqual('333T>C');
+    });
+
+    it('should combine a sequence of and expressions', function () {
+      var result = SVN.matchAll('111A>T&222G>C&333T>C&444A>G', 'gSimpleVariantPattern');
+      expect(result).toBeInstanceOf(AndExpr);
+      expect(result.pattern).toEqual('gSimpleVariant');
+      expect(result.expressions).toHaveLength(4);
+      result.expressions.forEach(exp=>expect(exp).toBeInstanceOf(SimpleVariant));
+    });
+
+    it('should combine a sequence of or expressions', function () {
+      var result = SVN.matchAll('111A>T^222G>C^333T>C^444A>G', 'gSimpleVariantPattern');
+      expect(result).toBeInstanceOf(OrExpr);
+      expect(result.pattern).toEqual('gSimpleVariant');
+      expect(result.expressions).toHaveLength(4);
+      result.expressions.forEach(exp=>expect(exp).toBeInstanceOf(SimpleVariant));
+    });
+
+
     context('Building a SequenceVariantPattern', function () {
-      it('should return a SequenceVariantPattern', function () {
+      it('should return a SequenceVariantPattern with an or expression in an allele', function () {
         var result = SVN.matchAll('NC0001_01.11:g.[111A>T^222G>C]', 'svnVariantPattern');
         expect(result).toBeInstanceOf(SequenceVariantPattern);
         expect(result.variant).toBeInstanceOf(OrExpr);

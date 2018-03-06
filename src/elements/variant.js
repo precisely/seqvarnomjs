@@ -46,6 +46,10 @@ export class UnphasedVariant {
       // see if any of the phased variants match this pattern     return this.variants.some(variant=>variant.match(pattern));
     }
   }
+
+  toString() {
+    return this.variants(v=>toString()).join('(;)');
+  }
 }
 
 export class TransVariant {
@@ -56,6 +60,10 @@ export class TransVariant {
   get type() {
     return 'trans';
   }
+
+  toString() {
+    return this.variants(v=>v.toString()).join(';');
+  }
 }
 
 export class CisVariant { // aka Allele
@@ -65,6 +73,10 @@ export class CisVariant { // aka Allele
 
   get type() {
     return 'cis';
+  }
+
+  toString() {
+    return '[' + this.variants(v=>v.toString()).join(';') + ']';
   }
 }
 
@@ -81,5 +93,13 @@ export class SimpleVariant {
 
   get type() {
     return 'posedit';
+  }
+
+  toString() {
+    if (this.uncertain) {
+      return `(${this.pos.toString()}${this.edit.toString()})`;
+    } else {
+      return `${this.pos.toString()}${this.edit.toString()}`;
+    }
   }
 }

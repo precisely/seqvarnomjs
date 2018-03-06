@@ -30,14 +30,13 @@ ometa SVN {
 
   // SeqVariantPattern
   svnVariantPattern = logicPattern(#svnVariantPatternTypes),
-  svnVariantPatternTypes = cSeqVariantSubPattern | gSeqVariantSubPattern,
-  cSeqVariantSubPattern = accn:ac ':' 'c':type '.' logicPattern(#cSequenceVariantPatternVariantPattern):variant
+  svnVariantPatternTypes = cSeqVariantSubPattern | gSeqVariantSubPattern, // TODO: add other types (m,n,p,r)
+  cSeqVariantSubPattern = accn:ac ':' 'c':type '.' logicPattern(#cSequenceVariantPatternVariants):variant
                         -> new elements.SequenceVariantPattern({ac:ac, type:type, variant:variant}),
-  gSeqVariantSubPattern = accn:ac ':' 'g':type '.' logicPattern(#gSequenceVariantPatternVariantPattern):variant
+  gSeqVariantSubPattern = accn:ac ':' 'g':type '.' logicPattern(#gSequenceVariantPatternVariants):variant
                         -> new elements.SequenceVariantPattern({ac:ac, type:type, variant:variant}),
-
-  cSequenceVariantPatternVariantPattern = (cUnphasedVariantPattern | cTransVariantPattern | cCisVariantPattern | cSimpleVariantPattern),
-  gSequenceVariantPatternVariantPattern = (gUnphasedVariantPattern | gTransVariantPattern | gCisVariantPattern | gSimpleVariantPattern),
+  cSequenceVariantPatternVariants = (cUnphasedVariantPattern | cTransVariantPattern | cCisVariantPattern | cSimpleVariantPattern),
+  gSequenceVariantPatternVariants = (gUnphasedVariantPattern | gTransVariantPattern | gCisVariantPattern | gSimpleVariantPattern),
 
   ////////////////////////////////////////////////////////////////////////////
   // HGVS Edit (without accession); e.g., c.76+3A>T
@@ -66,10 +65,6 @@ ometa SVN {
   nHgvsPosition = accn:ac ':' 'n':type '.' nInterval:pos -> new elements.HGVSPosition({ac:ac, type:type, pos:post}),
   pHgvsPosition = accn:ac ':' 'p':type '.' pInterval:pos -> new elements.HGVSPosition({ac:ac, type:type, pos:post}),
   rHgvsPosition = accn:ac ':' 'r':type '.' rInterval:pos -> new elements.HGVSPosition({ac:ac, type:type, pos:post}),
-
-  ////////////////////////////////////////////////////////////////////////////
-  // VariantPattern
-  cVariantPatternType = cUnphasedVariantPattern | cPhasedVariantPattern
 
   ////////////////////////////////////////////////////////////////////////////
   // UnphasedVariant - phased(;)phased(;)phased...
@@ -144,19 +139,12 @@ ometa SVN {
   ////////////////////////////////////////////////////////////////////////////
   // LogicPatterns -- allows and, or, not matching and logical grouping
 
-  logicExpr :pattern = apply(pattern):expr | anything:expr ?(elements.isLogicExpr(expr, pattern)) -> expr,
-  logicExprList :pattern :sep =
-      listOf(pattern, sep):exprs ?(exprs.length>1) -> exprs
-    | (logicExpr(pattern):expr1 char:c ?(c===sep) logicPattern(pattern):expr2 -> [expr1, expr2]),
-  maybeBracedPatternList :pattern :sep = logicExprList(pattern, sep) | ('{' logicExprList(pattern, sep):exprs '}' -> exprs),
-  maybeBracedPattern :pattern = apply(pattern) | ('{' (apply(pattern) | empty):expr '}' -> expr),
-
-  andPattern :pattern = maybeBracedPatternList(pattern, '&'):exprs -> new elements.AndExpr(exprs, pattern),
-  orPattern :pattern = maybeBracedPatternList(pattern, '^'):exprs -> new elements.OrExpr(exprs, pattern),
-  notPattern :pattern = '!' (logicExpr(pattern) | logicPattern(pattern)):expr -> new elements.NotExpr(expr, pattern),
-
-  logicPattern :pattern = andPattern(pattern) | orPattern(pattern) | notPattern(pattern)
-                        | maybeBracedPattern(pattern) | ('{' logicPattern(pattern):expr '}' -> expr),
+  logicPattern :pattern = andPattern(pattern) | orPattern(pattern) | notPattern(pattern) | apply(pattern) | groupedLogicPattern(pattern),
+  groupedLogicPattern :pattern = '{' logicPattern(pattern):expr '}' -> expr,
+  andPattern :pattern = logicExpr(pattern):lhs '&' logicPattern(pattern):rhs -> new elements.AndExpr(lhs, rhs, pattern),
+  orPattern :pattern = logicExpr(pattern):lhs '^' logicPattern(pattern):rhs -> new elements.OrExpr(lhs, rhs, pattern),
+  notPattern :pattern = '!' logicPattern(pattern):expr -> new elements.NotExpr(expr, pattern),
+  logicExpr :pattern = apply(pattern):expr | groupedLogicPattern(pattern):expr | anything:expr ?(elements.isLogicExpr(expr, pattern)) -> expr,
 
   ////////////////////////////////////////////////////////////////////////////
   // Edits -- sequence-specific operations at a position

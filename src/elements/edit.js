@@ -8,7 +8,7 @@ export class NARefAlt extends Edit {
     this.alt = alt;
   }
 
-  type() {
+  get type() {
     let editType;
     if (this.ref !== null && this.alt !== null) {
       if (this.ref === this.alt) {
@@ -24,6 +24,22 @@ export class NARefAlt extends Edit {
       editType = 'ins';
     }
     return editType;
+  }
+
+  toString() {
+    switch (this.type) {
+      case 'identity':
+        return '=';
+      case 'delins':
+      case 'sub':
+        return `${this.ref}>${this.alt}`;
+      case 'del':
+        return `${this.ref}del`;
+      case 'ins':
+        return `${this.alt}ins`;
+      default:
+        throw new Error(`Unknown Edit type ${this.type}`);
+    }
   }
 }
 
@@ -65,7 +81,7 @@ export class AARefAlt extends Edit {
     this.alt = alt;
   }
 
-  type() {
+  get type() {
     let editType;
     if (this.ref !== null && this.alt !== null) {
       if (this.ref === this.alt) {
@@ -86,7 +102,7 @@ export class AARefAlt extends Edit {
 
 // amino acid substitution
 export class AASub extends AARefAlt {
-  type() {
+  get type() {
     return 'sub';
   }
 }
