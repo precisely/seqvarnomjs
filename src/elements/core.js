@@ -30,6 +30,15 @@ export class Interval {
       return 'interval';
     }
   }
+
+  toString() {
+    switch (this.type) {
+      case 'point':
+        return `${this.start}`;;
+      case 'interval':
+        return `${this.start}_${this.end}`;
+    }
+  }
 }
 
 export class BaseOffsetPosition {

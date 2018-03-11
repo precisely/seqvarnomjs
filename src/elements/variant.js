@@ -1,6 +1,14 @@
+import { LogicExpr }  from './logic';
 
-export class SequenceVariant {
+/**
+ * A variant of a named biological sequence
+ * @export
+ * @class SequenceVariant
+ * @extends {LogicExpr}
+ */
+export class SequenceVariant extends LogicExpr {
   constructor({ ac, type, variant }) {
+    super();
     this.ac = ac;
     this.type = type;
     this.variant = variant;
@@ -23,14 +31,10 @@ export class SequenceVariant {
   }
 }
 
-export class SequenceVariantPattern extends SequenceVariant {}
-
-function findMatchInArray(array, pattern) {
-  return array.some(elt=>elt.match(pattern));
-}
-
-export class UnphasedVariant {
+class SubSequenceVariant extends LogicExpr {}
+export class UnphasedVariant extends SubSequenceVariant {
   constructor({ variants }) {
+    super();
     this.variants = variants;
   }
 
@@ -46,30 +50,45 @@ export class UnphasedVariant {
       // see if any of the phased variants match this pattern     return this.variants.some(variant=>variant.match(pattern));
     }
   }
+
+  toString() {
+    return this.variants(v=>toString()).join('(;)');
+  }
 }
 
-export class TransVariant {
+export class TransVariant extends SubSequenceVariant {
   constructor({ variants }) {
+    super();
     this.variants = variants;
   }
 
   get type() {
     return 'trans';
   }
+
+  toString() {
+    return this.variants(v=>v.toString()).join(';');
+  }
 }
 
-export class CisVariant { // aka Allele
+export class CisVariant extends SubSequenceVariant { // aka Allele
   constructor({ variants }) {
+    super();
     this.variants = variants;
   }
 
   get type() {
     return 'cis';
   }
+
+  toString() {
+    return '[' + this.variants.map(v=>v.toString()).join(';') + ']';
+  }
 }
 
-export class SimpleVariant {
+export class SimpleVariant extends SubSequenceVariant {
   constructor({ pos, edit, uncertain }) {
+    super();
     this.pos = pos;
     this.edit = edit;
     this.uncertain = uncertain || false;
@@ -77,9 +96,19 @@ export class SimpleVariant {
 
   setUncertain() {
     this.uncertain = this.uncertain;
+    return this;
   }
 
   get type() {
     return 'posedit';
   }
+
+  toString() {
+    if (this.uncertain) {
+      return `(${this.pos.toString()}${this.edit ? this.edit.toString() : '='})`;
+    } else {
+      return `${this.pos.toString()}${this.edit ? this.edit.toString() : '='}`;
+    }
+  }
 }
+

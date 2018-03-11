@@ -20,16 +20,24 @@ We add extensions to the existing standard which allows us to perform pattern ma
 
 * OR operator `^`
 * AND operator `&`
+* NOT operator `!`
 * GROUPING operator `{}`
 
+Logic operators can be used throughout the expression
 E.g.,
 
 * match either simple variant `111T>G` or `222A>G`
   `NC0001_1.11:g.[111T>G^222A>G]`
-* match a simple variant on one chromosome or another
+* match one or another sequence variant
   `{NC0001_1.11:g.111T>G}^{NC0002_2.11:g.222T>G}`
-* match a complex condition ((111 or 222) and (333 or 444))
+* match a complex condition ((111 or 222) and (333 or 444)) on one cis variant
   `NC0001_1.11:g.[{111T>G^222T>G}&{333>T>G^444T>G}]`
+* match either one transvariant pattern or another
+  `NC0001_1.11:g.{[111T>G];[222T>G]}^{[333T>G];[444T>G]}`
+* match either one unphased variant pattern or another
+  `NC0001_1.11:g.{[111T>G](;)[222T>G]}^{[333T>G](;)[444T>G]}`
+* use nested logical operators
+  `{NC0001_1.11:g.111T>G}^{NC0002_2.11:g.{[111T>G]^[222T>G]}^{[333T>G];[444T>G]}}`
 
 ## API
 
