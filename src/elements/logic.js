@@ -1,7 +1,4 @@
 export class LogicExpr {
-  constructor(pattern) {
-    this.pattern = pattern;
-  }
 }
 
 class OpExpr {
@@ -11,10 +8,9 @@ class OpExpr {
 }
 
 export class OrExpr extends OpExpr {
-  constructor(lhs, rhs, subclass) {
-    super(subclass);
+  constructor(lhs, rhs) {
+    super();
     this.expressions = combineExpressions(lhs, rhs, OrExpr);
-    this.subclass = subclass;
   }
 
   toString() {
@@ -23,10 +19,9 @@ export class OrExpr extends OpExpr {
 }
 
 export class AndExpr extends OpExpr {
-  constructor(lhs, rhs, subclass) {
-    super(subclass);
+  constructor(lhs, rhs) {
+    super();
     this.expressions = combineExpressions(lhs, rhs, AndExpr);
-    this.subclass = subclass;
   }
 
   toString() {
@@ -35,8 +30,8 @@ export class AndExpr extends OpExpr {
 }
 
 export class NotExpr extends OpExpr {
-  constructor(expression, subclass) {
-    super(exprSubclass(expression));
+  constructor(expression) {
+    super();
     this.expression = expression;
   }
 
@@ -100,36 +95,9 @@ export class SubSequenceVariant {}
  * @returns LogicExpr
  */
 export function binaryOperator(op, lhs, rhs) {
-  var lhsSubclass = exprSubclass(lhs);
-  var rhsSubclass = exprSubclass(rhs);
-  if (lhsSubclass !== rhsSubclass) {
-    throw new Error(`Can't combine "${lhs.toString()}" and "${rhs.toString()}" using ${op}`);
-  }
-
   switch (op) {
-    case '&': return new AndExpr(lhs, rhs, lhsSubclass);
-    case '^': return new OrExpr(lhs, rhs, lhsSubclass);
+    case '&': return new AndExpr(lhs, rhs);
+    case '^': return new OrExpr(lhs, rhs);
     default: throw new Error(`Invalid expression: ${lhs.toString()}${op}${rhs.toString()}`);
-  }
-}
-
-function exprSubclass(expr) {
-  return;
-  if (expr instanceof SubSequenceVariant) {
-    return SubSequenceVariant;
-  } else if (expr instanceof OpExpr) {
-    return expr.subclass;
-  } if (expr instanceof SequenceVariant) {
-    return SequenceVariant;
-  }
-}
-
-
-////////////////////////////////////////////////////////////////////
-// Checks for logic consistency
-
-function checkLogic(expr, predicate) {
-  if (expr instanceof AndExpr || expr instanceof OrExpr) {
-
   }
 }

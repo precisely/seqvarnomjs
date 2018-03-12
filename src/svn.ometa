@@ -16,13 +16,18 @@ var AndExpr = elements.AndExpr;
 var OrExpr = elements.OrExpr;
 var NotExpr = elements.NotExpr;
 var LogicExpr = elements.LogicExpr;
+
+function logIt() {
+  console.log.apply(arguments);
+  return null;
+}
 ometa Logic {
   ////////////////////////////////////////////////////////////////////////////
   // Logic
   logic =
       logic:lhs binaryOperator:op logicTerm:rhs -> binaryOperator(op, lhs, rhs)
     | logicTerm,
-  logicTerm = notExpr | groupedExpr | logic | baseExpr | anything:x ?(x instanceof LogicExpr),
+  logicTerm = logic | notExpr | groupedExpr | anything:x ?(x instanceof LogicExpr) | baseExpr,
   notExpr =
       '!' baseExpr:expr -> new NotExpr(expr)
     | '!' logic:expr -> new NotExpr(expr),
@@ -84,7 +89,7 @@ ometa GenomicCis <: Logic {
       ('[' listOf(elt,';'):edits ?(edits.length===1) ']' -> edits[0])
     | ('[' listOf(elt,';'):edits ?(edits.length>1) ']' -> new CisVariant({variants:edits})),
 
-  simpleLogic            = GenomicSimple.logic,
+  simpleLogic            = GenomicSimple.logic | GenomicSimple.variant,
   simpleVariant          = GenomicSimple.variant,
   baseExpr               = cisBracketPattern(#simpleLogic),
   variant                = cisBracketPattern(#simpleVariant)
@@ -92,25 +97,28 @@ ometa GenomicCis <: Logic {
 
 ometa GenomicTrans <: Logic {
   transPattern :elt = listOf(elt, ';'):variants ?(variants.length>1) -> new TransVariant({variants:variants}),
-  cisLogic          = GenomicCis.logic,
+  cisLogic          = GenomicCis.logic | GenomicCis.variant,
   cisVariant        = GenomicCis.variant,
   baseExpr          = transPattern(#cisLogic),
   variant           = transPattern(#cisVariant)
 }
 
 ometa GenomicUnphased <: Logic {
-  unphasedPattern :elt = listOf(elt, '(;)'):variants ?(variants.length>1) -> new UnphasedVariant({variants:variants}),
-  baseExpr = unphasedPattern(), //phasedLogic
-  phasedLogic = GenomicTrans.logic | GenomicCis.logic | GenomicSimple.logic,
+  phasedVariantLogics = GenomicTrans.logic | GenomicCis.logic | GenomicSimple.logic,
+  baseExpr =
+      listOf(#phasedVariantLogics, '(;)'):variants ?(variants.length>1) -> new UnphasedVariant({variants:variants})
+    | phasedVariantLogics,
   phasedVariants = GenomicTrans.variant | GenomicCis.variant,
-  variant = unphasedPattern(#phasedVariants)
+  variant =
+      listOf(#phasedVariants, '(;)'):variants ?(variants.length>1) -> new UnphasedVariant({variants:variants})
+    | phasedVariants
 }
 
 ometa SVN <: Logic {
   gVariant = GenomicUnphased.variant | GenomicTrans.variant | GenomicCis.variant | GenomicSimple.variant,
   gSeqVariant = seqVariantPattern('g', #gVariant),
   variant = gSeqVariant,
-  gLogic = GenomicUnphased.logic | GenomicTrans.logic | GenomicCis.logic | GenomicSimple.logic,
+  gLogic = GenomicUnphased.logic | GenomicTrans.logic | GenomicCis.logic | GenomicUnphased.variant | GenomicTrans.variant | GenomicCis.variant,
   baseExpr = seqVariantPattern('g', #gLogic),
 
   // Accessions, possibly versioned. Should accept, e.g., NM_01234.5, LRG_01234_1p1

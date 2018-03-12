@@ -32,6 +32,7 @@ export class SequenceVariant extends LogicExpr {
 }
 
 class SubSequenceVariant extends LogicExpr {}
+
 export class UnphasedVariant extends SubSequenceVariant {
   constructor({ variants }) {
     super();
@@ -52,7 +53,7 @@ export class UnphasedVariant extends SubSequenceVariant {
   }
 
   toString() {
-    return this.variants(v=>toString()).join('(;)');
+    return this.variants.map(v=>v.toString()).join('(;)');
   }
 }
 
@@ -67,7 +68,7 @@ export class TransVariant extends SubSequenceVariant {
   }
 
   toString() {
-    return this.variants(v=>v.toString()).join(';');
+    return this.variants.map(v=>v.toString()).join(';');
   }
 }
 
