@@ -322,15 +322,46 @@ describe('svn.ometa', function () {
       expect(result.expressions).toHaveLength(4);
       result.expressions.forEach(exp=>expect(exp).toBeInstanceOf(SimpleVariant));
     });
-
-
-    context('Building a SequenceVariantPattern', function () {
-      it('should return a SequenceVariantPattern with an or expression in an allele', function () {
-        var result = SVN.matchAll('NC0001_01.11:g.[111A>T^222G>C]', 'svnVariantPattern');
-        expect(result).toBeInstanceOf(SequenceVariantPattern);
-        expect(result.variant).toBeInstanceOf(OrExpr);
-        expect(result.variant.expressions).toHaveLength(2);
-      });
+  });
+  context('Building a SequenceVariantPattern', function () {
+    it('should return a SequenceVariantPattern with an or expression in an allele', function () {
+      var result = SVN.matchAll('NC0001_01.11:g.[111A>T^222G>C]', 'svnVariantPattern');
+      expect(result).toBeInstanceOf(SequenceVariantPattern);
+      expect(result.variant).toBeInstanceOf(OrExpr);
+      expect(result.variant.expressions).toHaveLength(2);
     });
   });
+  context('when provided an expression containing hierarchical logic', function () {
+    var result;
+
+    beforeAll(function () {
+      result = SVN.matchAll('NC0001_01.11:g.[111A>T;222G>C];[333=;444A>C]^[555=;{666>G^777=}](;)[888=;999>C]^[000A>G]', 'svnVariant');
+    });
+
+    it('should produce the correct type of variant', function () {
+      expect(result).toBeInstanceOf(SequenceVariant);
+    });
+
+    it('should bind logic operators with lower precedence than other expressions', function () {
+
+        // NC0001_01.11:g.[111A>T;222G>C];[333=;444A>C]^[555=;{666>G^777=}](;)[888=;999>C]^[000A>G]', 'logic');
+        //                1)^^^^^^^^^^^^^^^^^^^^^^^^^^  2)^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ 3)^^^^^^
+        expect(result.variant).toBeInstanceOf(OrExpr);
+        expect(result.variant.expressions).toHaveLength(3);
+
+        var [variant1, variant2, variant3] = result.variant.expressions;
+        expect(variant1).toBeInstanceOf(TransVariant);
+        expect(variant1.toString()).toEqual('[111A>T;222G>C]');
+        console.log(variant2.toString());
+        expect(variant2).toBeInstanceOf(UnphasedVariant);
+        expect(variant2.variants).toHaveLength(2);
+        expect(variant2.variants[0]).toBeInstanceOf(CisVariant);
+        expect(variant2.variants[0].variants).toHaveLength(2);
+        expect(variant2.variants[0].variants[0].toString()).toEqual('666=');
+        expect(variant2.variants[0].variants[1]).toBeInstanceOf(OrExpr);
+        expect(variant2.toString()).toEqual('[666=;{777A>G^888=}](;)[333=;444T>C]');
+    });
+
+  });
+
 });

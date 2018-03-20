@@ -1,6 +1,25 @@
 var elements = require('./elements');
 var constants = require('./constants');
 
+var NARefAlt = elements.NARefAlt;
+var Interval = elements.Interval;
+var BaseOffsetInterval = elements.NARefAlt;
+var SequenceVariant = elements.SequenceVariant;
+var SequenceVariantPattern = elements.SequenceVariantPattern;
+var BaseOffsetPosition = elements.BaseOffsetPosition;
+var SimpleVariant = elements.SimpleVariant;
+var TransVariant = elements.TransVariant;
+var CisVariant = elements.CisVariant;
+var UnphasedVariant = elements.UnphasedVariant;
+var Inv = elements.Inv;
+
+var binaryOperator = elements.binaryOperator;
+var AndExpr = elements.AndExpr;
+var OrExpr = elements.OrExpr;
+var NotExpr = elements.NotExpr;
+var LogicExpr = LogicExpr;
+
+
 ometa SVN {
   // This file describes an OMeta grammar for a subset of the HGVS
   // variant specification.  The subset is limited to is limited to those
@@ -20,21 +39,21 @@ ometa SVN {
   svnVariant = gSeqVariant | mSeqVariant | cSeqVariant | nSeqVariant  | rSeqVariant | pSeqVariant,
 
   cSeqVariant = accn:ac ':' 'c':type '.' (cUnphasedVariant | cTransVariant | cCisVariant | cSimpleVariant):variant
-              -> new elements.SequenceVariant({ac:ac, type:type, variant:variant}),
+              -> new SequenceVariant({ac:ac, type:type, variant:variant}),
   gSeqVariant = accn:ac ':' 'g':type '.' (gUnphasedVariant | gTransVariant | gCisVariant | gSimpleVariant):variant
-              -> new elements.SequenceVariant({ac:ac, type:type, variant:variant}),
-  mSeqVariant = accn:ac ':' 'm':type '.' mSimpleVariant:variant -> new elements.SequenceVariant({ac:ac, type:type, variant:variant}),
-  nSeqVariant = accn:ac ':' 'n':type '.' nSimpleVariant:variant -> new elements.SequenceVariant({ac:ac, type:type, variant:variant}),
-  pSeqVariant = accn:ac ':' 'p':type '.' pSimpleVariant:variant -> new elements.SequenceVariant({ac:ac, type:type, variant:variant}),
-  rSeqVariant = accn:ac ':' 'r':type '.' rSimpleVariant:variant -> new elements.SequenceVariant({ac:ac, type:type, variant:variant}),
+              -> new SequenceVariant({ac:ac, type:type, variant:variant}),
+  mSeqVariant = accn:ac ':' 'm':type '.' mSimpleVariant:variant -> new SequenceVariant({ac:ac, type:type, variant:variant}),
+  nSeqVariant = accn:ac ':' 'n':type '.' nSimpleVariant:variant -> new SequenceVariant({ac:ac, type:type, variant:variant}),
+  pSeqVariant = accn:ac ':' 'p':type '.' pSimpleVariant:variant -> new SequenceVariant({ac:ac, type:type, variant:variant}),
+  rSeqVariant = accn:ac ':' 'r':type '.' rSimpleVariant:variant -> new SequenceVariant({ac:ac, type:type, variant:variant}),
 
   // SeqVariantPattern
   svnVariantPattern = logicPattern(#svnVariantPatternTypes),
   svnVariantPatternTypes = cSeqVariantSubPattern | gSeqVariantSubPattern, // TODO: add other types (m,n,p,r)
   cSeqVariantSubPattern = accn:ac ':' 'c':type '.' logicPattern(#cSequenceVariantPatternVariants):variant
-                        -> new elements.SequenceVariantPattern({ac:ac, type:type, variant:variant}),
+                        -> new SequenceVariantPattern({ac:ac, type:type, variant:variant}),
   gSeqVariantSubPattern = accn:ac ':' 'g':type '.' logicPattern(#gSequenceVariantPatternVariants):variant
-                        -> new elements.SequenceVariantPattern({ac:ac, type:type, variant:variant}),
+                        -> new SequenceVariantPattern({ac:ac, type:type, variant:variant}),
   cSequenceVariantPatternVariants = (cUnphasedVariantPattern | cTransVariantPattern | cCisVariantPattern | cSimpleVariantPattern),
   gSequenceVariantPatternVariants = (gUnphasedVariantPattern | gTransVariantPattern | gCisVariantPattern | gSimpleVariantPattern),
 
@@ -45,13 +64,13 @@ ometa SVN {
   // installations provide variants like c.222A>T.
 
   cTypedSimpleVariant = 'c':type '.' (cUnphasedVariant | cTransVariant | cCisVariant | cSimpleVariant):variant
-                    -> new elements.SequenceVariant({ac:null, type:type, variant:variant}),
+                    -> new SequenceVariant({ac:null, type:type, variant:variant}),
   gTypedSimpleVariant = 'g':type '.' (gUnphasedVariant | gTransVariant | gCisVariant | gSimpleVariant):variant
-                    -> new elements.SequenceVariant({ac:ac, type:type, variant:variant}),
-  mTypedSimpleVariant = 'm':type '.' mSimpleVariant:variant -> new elements.SequenceVariant({ac:null, type:type, variant:variant}),
-  nTypedSimpleVariant = 'n':type '.' nSimpleVariant:variant -> new elements.SequenceVariant({ac:null, type:type, variant:variant}),
-  pTypedSimpleVariant = 'p':type '.' pSimpleVariant:variant -> new elements.SequenceVariant({ac:null, type:type, variant:variant}),
-  rTypedSimpleVariant = 'r':type '.' rSimpleVariant:variant -> new elements.SequenceVariant({ac:null, type:type, variant:variant}),
+                    -> new SequenceVariant({ac:ac, type:type, variant:variant}),
+  mTypedSimpleVariant = 'm':type '.' mSimpleVariant:variant -> new SequenceVariant({ac:null, type:type, variant:variant}),
+  nTypedSimpleVariant = 'n':type '.' nSimpleVariant:variant -> new SequenceVariant({ac:null, type:type, variant:variant}),
+  pTypedSimpleVariant = 'p':type '.' pSimpleVariant:variant -> new SequenceVariant({ac:null, type:type, variant:variant}),
+  rTypedSimpleVariant = 'r':type '.' rSimpleVariant:variant -> new SequenceVariant({ac:null, type:type, variant:variant}),
 
   ////////////////////////////////////////////////////////////////////////////
   // HGVS Position -- e.g., NM_01234.5:c.22+6 (without an edit)
@@ -59,18 +78,18 @@ ometa SVN {
 
   hgvsPosition     = gHgvsPosition | mHgvsPosition | cHgvsPosition | nHgvsPosition | rHgvsPosition | pHgvsPosition,
 
-  cHgvsPosition = accn:ac ':' 'c':type '.' cInterval:pos -> new elements.HGVSPosition({ac:ac, type:type, pos:post}),
-  gHgvsPosition = accn:ac ':' 'g':type '.' gInterval:pos -> new elements.HGVSPosition({ac:ac, type:type, pos:post}),
-  mHgvsPosition = accn:ac ':' 'm':type '.' mInterval:pos -> new elements.HGVSPosition({ac:ac, type:type, pos:post}),
-  nHgvsPosition = accn:ac ':' 'n':type '.' nInterval:pos -> new elements.HGVSPosition({ac:ac, type:type, pos:post}),
-  pHgvsPosition = accn:ac ':' 'p':type '.' pInterval:pos -> new elements.HGVSPosition({ac:ac, type:type, pos:post}),
-  rHgvsPosition = accn:ac ':' 'r':type '.' rInterval:pos -> new elements.HGVSPosition({ac:ac, type:type, pos:post}),
+  cHgvsPosition = accn:ac ':' 'c':type '.' cInterval:pos -> new HGVSPosition({ac:ac, type:type, pos:post}),
+  gHgvsPosition = accn:ac ':' 'g':type '.' gInterval:pos -> new HGVSPosition({ac:ac, type:type, pos:post}),
+  mHgvsPosition = accn:ac ':' 'm':type '.' mInterval:pos -> new HGVSPosition({ac:ac, type:type, pos:post}),
+  nHgvsPosition = accn:ac ':' 'n':type '.' nInterval:pos -> new HGVSPosition({ac:ac, type:type, pos:post}),
+  pHgvsPosition = accn:ac ':' 'p':type '.' pInterval:pos -> new HGVSPosition({ac:ac, type:type, pos:post}),
+  rHgvsPosition = accn:ac ':' 'r':type '.' rInterval:pos -> new HGVSPosition({ac:ac, type:type, pos:post}),
 
   ////////////////////////////////////////////////////////////////////////////
   // UnphasedVariant - phased(;)phased(;)phased...
 
-  cUnphasedVariant = listOf(#cPhasedVariants, '(;)'):phasedVariants ?(phasedVariants.length>1) -> new elements.UnphasedVariant({variants:phasedVariants}),
-  gUnphasedVariant = listOf(#gPhasedVariants, '(;)'):phasedVariants ?(phasedVariants.length>1) -> new elements.UnphasedVariant({variants:phasedVariants}),
+  cUnphasedVariant = listOf(#cPhasedVariants, '(;)'):phasedVariants ?(phasedVariants.length>1) -> new UnphasedVariant({variants:phasedVariants}),
+  gUnphasedVariant = listOf(#gPhasedVariants, '(;)'):phasedVariants ?(phasedVariants.length>1) -> new UnphasedVariant({variants:phasedVariants}),
 
   // UnphasedVariantPattern
   cUnphasedVariantPattern = logicPattern(#cPhasedVariantPattern),
@@ -89,8 +108,8 @@ ometa SVN {
   ////////////////////////////////////////////////////////////////////////////
   // TransVariant - cisVariant;cisVariant;cisVariant... edits are in trans
 
-  cTransVariant = listOf(#cCisVariant, ';'):cisVariants ?(cisVariants.length>1) -> new elements.TransVariant({variants:cisVariants})),
-  gTransVariant = listOf(#gCisVariant, ';'):cisVariants ?(cisVariants.length>1) -> new elements.TransVariant({variants:cisVariants}),
+  cTransVariant = listOf(#cCisVariant, ';'):cisVariants ?(cisVariants.length>1) -> new TransVariant({variants:cisVariants}),
+  gTransVariant = listOf(#gCisVariant, ';'):cisVariants ?(cisVariants.length>1) -> new TransVariant({variants:cisVariants}),
 
   // TransVariant Patterns
   cTransVariantPattern = logicPattern(#cCisVariantPattern),
@@ -101,7 +120,7 @@ ometa SVN {
 
   cisBracketPattern :elt =
       ('[' listOf(elt,';'):edits ?(edits.length===1) ']' -> edits[0])
-    | ('[' listOf(elt,';'):edits ?(edits.length>1) ']' -> new elements.CisVariant({variants:edits})),
+    | ('[' listOf(elt,';'):edits ?(edits.length>1) ']' -> new CisVariant({variants:edits})),
 
   cCisVariant = cisBracketPattern(#cSimpleVariant),
   gCisVariant = cisBracketPattern(#gSimpleVariant),
@@ -115,21 +134,21 @@ ometa SVN {
   ////////////////////////////////////////////////////////////////////////////
   // SimpleVariant a single position with an optional edit (ref=>alt change)
   //               simple variant with a null edit indicates the reference sequence was found
-  cSimpleVariant = cInterval:pos dnaEdit:edit -> new elements.SimpleVariant({pos:pos,edit:edit}),
-  gSimpleVariant = gInterval:pos dnaEdit:edit -> new elements.SimpleVariant({pos:pos,edit:edit}),
-  mSimpleVariant = mInterval:pos dnaEdit:edit -> new elements.SimpleVariant({pos:pos,edit:edit}),
-  nSimpleVariant = nInterval:pos dnaEdit:edit -> new elements.SimpleVariant({pos:pos,edit:edit}),
-  rSimpleVariant = (rInterval:pos rnaEdit:edit -> new elements.SimpleVariant({pos:pos,edit:edit}))
-    | ('(' rInterval:pos rnaEdit:edit ')' -> new elements.SimpleVariant({pos:pos,edit:edit})),
+  cSimpleVariant = cInterval:pos dnaEdit:edit -> new SimpleVariant({pos:pos,edit:edit}),
+  gSimpleVariant = gInterval:pos dnaEdit:edit -> new SimpleVariant({pos:pos,edit:edit}),
+  mSimpleVariant = mInterval:pos dnaEdit:edit -> new SimpleVariant({pos:pos,edit:edit}),
+  nSimpleVariant = nInterval:pos dnaEdit:edit -> new SimpleVariant({pos:pos,edit:edit}),
+  rSimpleVariant = (rInterval:pos rnaEdit:edit -> new SimpleVariant({pos:pos,edit:edit}))
+    | ('(' rInterval:pos rnaEdit:edit ')' -> new SimpleVariant({pos:pos,edit:edit})),
 
-  pSimpleVariant   = (pInterval:pos proEdit:edit -> new elements.SimpleVariant({pos:pos,edit:edit}))
-    | ('(' pInterval:pos proEdit:edit ')' -> new elements.SimpleVariant({pos:pos,edit:edit}))
+  pSimpleVariant   = (pInterval:pos proEdit:edit -> new SimpleVariant({pos:pos,edit:edit}))
+    | ('(' pInterval:pos proEdit:edit ')' -> new SimpleVariant({pos:pos,edit:edit}))
     | pSimpleVariantSpecial,
   pSimpleVariantSpecial =
-        '=':x -> new elements.SimpleVariant({pos:null, edit:x, uncertain:false})
-    | '(' '=':x ')' -> new elements.SimpleVariant({pos:null, edit:x, uncertain:true})
-    | '0':x '?' -> new elements.SimpleVariant({pos:null, edit:x, uncertain:true})
-    | '0':x -> new elements.SimpleVariant({pos:null, edit:x, uncertain:false})
+        '=':x -> new SimpleVariant({pos:null, edit:x, uncertain:false})
+    | '(' '=':x ')' -> new SimpleVariant({pos:null, edit:x, uncertain:true})
+    | '0':x '?' -> new SimpleVariant({pos:null, edit:x, uncertain:true})
+    | '0':x -> new SimpleVariant({pos:null, edit:x, uncertain:false})
     | '?':x -> null,
 
   // SimpleVariant Patterns
@@ -141,9 +160,9 @@ ometa SVN {
 
   logicPattern :pattern = andPattern(pattern) | orPattern(pattern) | notPattern(pattern) | apply(pattern) | groupedLogicPattern(pattern),
   groupedLogicPattern :pattern = '{' logicPattern(pattern):expr '}' -> expr,
-  andPattern :pattern = logicExpr(pattern):lhs '&' logicPattern(pattern):rhs -> new elements.AndExpr(lhs, rhs, pattern),
-  orPattern :pattern = logicExpr(pattern):lhs '^' logicPattern(pattern):rhs -> new elements.OrExpr(lhs, rhs, pattern),
-  notPattern :pattern = '!' logicPattern(pattern):expr -> new elements.NotExpr(expr, pattern),
+  andPattern :pattern = logicExpr(pattern):lhs '&' logicPattern(pattern):rhs -> new AndExpr(lhs, rhs, pattern),
+  orPattern :pattern = logicExpr(pattern):lhs '^' logicPattern(pattern):rhs -> new OrExpr(lhs, rhs, pattern),
+  notPattern :pattern = '!' logicPattern(pattern):expr -> new NotExpr(expr, pattern),
   logicExpr :pattern = apply(pattern):expr | groupedLogicPattern(pattern):expr | anything:expr ?(elements.isLogicExpr(expr, pattern)) -> expr,
 
   ////////////////////////////////////////////////////////////////////////////
@@ -156,36 +175,36 @@ ometa SVN {
   dnaEditMU = dnaEdit | '(' dnaEdit:edit ')' -> edit.setUncertain(),
   dnaEdit   = dnaIdent | dnaSubst | dnaDelins | dnaIns | dnaDel | dnaDup | dnaInv | dnaCon | dnaCopy,
   dnaIdent  = <dna*>:ref '='           -> null,
-  dnaSubst  = dna:ref '>' dna:alt      -> new elements.NARefAlt({ref:ref,alt:alt}),
+  dnaSubst  = dna:ref '>' dna:alt      -> new NARefAlt({ref:ref,alt:alt}),
   dnaDelins = 'del' (<num>|<dna*>):ref 'ins' <dna+>:alt  -> null,
-  dnaDel    = 'del' (<num>|<dna*>):ref -> new elements.NARefAlt({ref:ref,alt:null}),
-  dnaIns    = 'ins' <dna+>:alt         -> new elements.NARefAlt({ref:null,alt:ref}),
-  dnaDup    = 'dup' <dna*>:ref         -> new elements.Dup({ref:ref}),
-  dnaInv    = 'inv' (<num>|<dna*>):ref -> new elements.Inv({ref:null}),
-  dnaCon    = 'con' hgvsPosition:pos  -> new elements.Conv({fromAc:pos.ac, fromType:pos.type, fromPos:pos.pos}),
-  dnaCopy   = 'copy' num:n -> new elements.NACopy({copy:n}),
+  dnaDel    = 'del' (<num>|<dna*>):ref -> new NARefAlt({ref:ref,alt:null}),
+  dnaIns    = 'ins' <dna+>:alt         -> new NARefAlt({ref:null,alt:ref}),
+  dnaDup    = 'dup' <dna*>:ref         -> new Dup({ref:ref}),
+  dnaInv    = 'inv' (<num>|<dna*>):ref -> new Inv({ref:null}),
+  dnaCon    = 'con' hgvsPosition:pos  -> new Conv({fromAc:pos.ac, fromType:pos.type, fromPos:pos.pos}),
+  dnaCopy   = 'copy' num:n -> new NACopy({copy:n}),
 
   rnaEditMU = rnaEdit | '(' rnaEdit:edit ')' -> edit.setUncertain(),
   rnaEdit   = rnaIdent | rnaSubst | rnaDelins | rnaIns | rnaDel | rnaDup | rnaInv | rnaCon,
-  rnaIdent  = <rna*>:ref '='                  -> new elements.NARefAlt({ref:ref,alt:ref}),
-  rnaSubst  = rna:ref '>' rna:alt             -> new elements.NARefAlt({ref:ref,alt:alt}),
-  rnaDelins = 'del' (<num>|<rna*>):ref 'ins' <rna+>:alt  -> new elements.NARefAlt({ref:ref,alt:alt}),
-  rnaDel    = 'del' (<num>|<rna*>):ref        -> new elements.NARefAlt({ref:ref,alt:null}),
-  rnaIns    = 'ins' <rna+>:alt                -> new elements.NARefAlt({ref:null,alt:alt}),
-  rnaDup    = 'dup' <rna*>:ref                -> new elements.Dup({ref:ref}),
-  rnaInv    = 'inv' (<num>|<rna*>):ref        -> new elements.Inv({ref:null}),
-  rnaCon    = 'con' hgvsPosition:pos         -> new elements.Conv({fromAc:pos.ac, fromType:pos.type, fromPos:pos.pos}),
+  rnaIdent  = <rna*>:ref '='                  -> new NARefAlt({ref:ref,alt:ref}),
+  rnaSubst  = rna:ref '>' rna:alt             -> new NARefAlt({ref:ref,alt:alt}),
+  rnaDelins = 'del' (<num>|<rna*>):ref 'ins' <rna+>:alt  -> new NARefAlt({ref:ref,alt:alt}),
+  rnaDel    = 'del' (<num>|<rna*>):ref        -> new NARefAlt({ref:ref,alt:null}),
+  rnaIns    = 'ins' <rna+>:alt                -> new NARefAlt({ref:null,alt:alt}),
+  rnaDup    = 'dup' <rna*>:ref                -> new Dup({ref:ref}),
+  rnaInv    = 'inv' (<num>|<rna*>):ref        -> new Inv({ref:null}),
+  rnaCon    = 'con' hgvsPosition:pos         -> new Conv({fromAc:pos.ac, fromType:pos.type, fromPos:pos.pos}),
 
   proEditMU = proEdit | '(' proEdit:edit ')' -> edit.setUncertain(),
   proEdit   = proFs | proExt | proSubst | proDelins | proIns | proDel | proDup | proIdent,
-  proSubst  = (aat13|'?'):alt                 -> new elements.AASub({ref:'',alt:alt}),
-  proDelins = 'delins' aat13Seq:alt          -> new elements.AASub({ref:'',alt:alt}),
-  proDel    = 'del'                           -> new elements.AASub({ref:'',alt:alt}),
-  proIns    = 'ins' aat13Seq:alt             -> new elements.AASub({ref:null,alt:alt}),
-  proDup    = 'dup'                           -> new elements.Dup({ref:''}),
-  proFs     = (aat13 | (-> '')):alt fs:length -> new elements.AAFs({ref:'', alt:alt, length:length}),
-  proExt    = aat13?:alt ext:ext              -> new elements.AAExt({ref:'', alt:alt, aaterm:ext.aaterm, length:ext.length}),
-  proIdent  = '='                             -> new elements.AARefAlt({ref:'',alt:''}),
+  proSubst  = (aat13|'?'):alt                 -> new AASub({ref:'',alt:alt}),
+  proDelins = 'delins' aat13Seq:alt          -> new AASub({ref:'',alt:alt}),
+  proDel    = 'del'                           -> new AASub({ref:'',alt:alt}),
+  proIns    = 'ins' aat13Seq:alt             -> new AASub({ref:null,alt:alt}),
+  proDup    = 'dup'                           -> new Dup({ref:''}),
+  proFs     = (aat13 | (-> '')):alt fs:length -> new AAFs({ref:'', alt:alt, length:length}),
+  proExt    = aat13?:alt ext:ext              -> new AAExt({ref:'', alt:alt, aaterm:ext.aaterm, length:ext.length}),
+  proIdent  = '='                             -> new AARefAlt({ref:'',alt:''}),
 
 
   ////////////////////////////////////////////////////////////////////////////
@@ -202,12 +221,12 @@ ometa SVN {
   rInterval = defRInterval | '(' defRInterval:iv ')' -> iv.setUncertain(),
 
   // definite intervals
-  defGInterval = (gPos:start '_' gPos:end -> new elements.Interval({start:start, end:end})) | (gPos:start -> start),
-  defMInterval = (mPos:start '_' mPos:end -> new elements.Interval({start:start, end:end})) | (mPos:start -> start),
-  defPInterval = (pPos:start '_' pPos:end -> new elements.Interval({start:start, end:end})) | (pPos:start -> start),
-  defRInterval = (rPos:start '_' rPos:end -> new elements.Interval({start:start, end:end})) | (rPos:start -> start),
-  defCInterval = (cPos:start '_' cPos:end -> new elements.BaseInterval({start:start, end:end})) | (cPos:start -> start),
-  defNInterval = (nPos:start '_' nPos:end -> new elements.BaseInterval({start:start, end:end})) | (nPos:start -> start),
+  defGInterval = (gPos:start '_' gPos:end -> new Interval({start:start, end:end})) | (gPos:start -> start),
+  defMInterval = (mPos:start '_' mPos:end -> new Interval({start:start, end:end})) | (mPos:start -> start),
+  defPInterval = (pPos:start '_' pPos:end -> new Interval({start:start, end:end})) | (pPos:start -> start),
+  defRInterval = (rPos:start '_' rPos:end -> new Interval({start:start, end:end})) | (rPos:start -> start),
+  defCInterval = (cPos:start '_' cPos:end -> new BaseInterval({start:start, end:end})) | (cPos:start -> start),
+  defNInterval = (nPos:start '_' nPos:end -> new BaseInterval({start:start, end:end})) | (nPos:start -> start),
 
   // positions
   cPos = defCPos | '(' defCPos:pos ')' -> pos.setUncertain(),
@@ -218,13 +237,13 @@ ometa SVN {
   rPos = defRPos | '(' defRPos:pos ')' -> pos.setUncertain(),
 
   // definite positions
-  defCPos = base:b offset:o -> new elements.BaseOffsetPosition({base:b,offset:o,datum:constants.CDS_START})
-        | '*' num:b offset:o -> new elements.BaseOffsetPosition({base:b,offset:o,datum:constants.CDS_END}),
+  defCPos = base:b offset:o -> new BaseOffsetPosition({base:b,offset:o,datum:constants.CDS_START})
+        | '*' num:b offset:o -> new BaseOffsetPosition({base:b,offset:o,datum:constants.CDS_END}),
   defGPos = (num|'?'->null):pos -> pos,
   defMPos = (num|'?'->null):pos -> pos,
-  defNPos = base:b offset:o -> new elements.BaseOffsetPosition({base:b,offset:o,datum:constants.SEQ_START}),
-  defPPos = (term13|aa13):aa num:pos -> new elements.AAPosition({base:pos,aa:aaToAa1(aa)}),
-  defRPos = base:b offset:o -> new elements.BaseOffsetPosition({base:b,offset:o,datum:constants.SEQ_START}),
+  defNPos = base:b offset:o -> new BaseOffsetPosition({base:b,offset:o,datum:constants.SEQ_START}),
+  defPPos = (term13|aa13):aa num:pos -> new AAPosition({base:pos,aa:aaToAa1(aa)}),
+  defRPos = base:b offset:o -> new BaseOffsetPosition({base:b,offset:o,datum:constants.SEQ_START}),
 
 
   ////////////////////////////////////////////////////////////////////////////
@@ -280,3 +299,7 @@ ometa SVN {
   // Accessions, possibly versioned. Should accept, e.g., NM_01234.5, LRG_01234_1p1
  accn = <letter letterOrDigit+ ('_' letterOrDigit+)? ('.' digit+)?>
 }
+
+module.exports = {
+  SVN:SVN
+};
