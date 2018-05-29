@@ -24,7 +24,8 @@
     "eslint-plugin-jest": "^21.12.3",
     "jest": "^22.4.2",
     "jest-plugin-context": "^2.7.0",
-    "regenerator-runtime": "^0.11.1"
+    "ts-jest": "^22.4.2",
+    "typescript": "^2.8.3"
   },
   "jest": {
     "setupFiles": [
@@ -37,7 +38,7 @@
       "<rootDir>",
       "node_modules"
     ],
-    "testRegex": "(/tests/.*-test|\\.(test|spec))\\.(js)$",
+    "testRegex": "(/tests/.*-test|\\.(test|spec))\\.(js|ts)$",
     "moduleFileExtensions": [
       "js",
       "json",
