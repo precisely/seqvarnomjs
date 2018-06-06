@@ -12,13 +12,7 @@ var TransVariant = elements.TransVariant;
 var CisVariant = elements.CisVariant;
 var UnphasedVariant = elements.UnphasedVariant;
 var Inv = elements.Inv;
-
-var binaryOperator = elements.binaryOperator;
-var AndExpr = elements.AndExpr;
-var OrExpr = elements.OrExpr;
-var NotExpr = elements.NotExpr;
-var LogicExpr = LogicExpr;
-
+var Uncertain = elements.Uncertain;
 
 ometa SVN {
   // This file describes an OMeta grammar for a subset of the HGVS
@@ -46,16 +40,6 @@ ometa SVN {
   nSeqVariant = accn:ac ':' 'n':type '.' nSimpleVariant:variant -> new SequenceVariant({ac:ac, type:type, variant:variant}),
   pSeqVariant = accn:ac ':' 'p':type '.' pSimpleVariant:variant -> new SequenceVariant({ac:ac, type:type, variant:variant}),
   rSeqVariant = accn:ac ':' 'r':type '.' rSimpleVariant:variant -> new SequenceVariant({ac:ac, type:type, variant:variant}),
-
-  // SeqVariantPattern
-  svnVariantPattern = logicPattern(#svnVariantPatternTypes),
-  svnVariantPatternTypes = cSeqVariantSubPattern | gSeqVariantSubPattern, // TODO: add other types (m,n,p,r)
-  cSeqVariantSubPattern = accn:ac ':' 'c':type '.' logicPattern(#cSequenceVariantPatternVariants):variant
-                        -> new SequenceVariantPattern({ac:ac, type:type, variant:variant}),
-  gSeqVariantSubPattern = accn:ac ':' 'g':type '.' logicPattern(#gSequenceVariantPatternVariants):variant
-                        -> new SequenceVariantPattern({ac:ac, type:type, variant:variant}),
-  cSequenceVariantPatternVariants = (cUnphasedVariantPattern | cTransVariantPattern | cCisVariantPattern | cSimpleVariantPattern),
-  gSequenceVariantPatternVariants = (gUnphasedVariantPattern | gTransVariantPattern | gCisVariantPattern | gSimpleVariantPattern),
 
   ////////////////////////////////////////////////////////////////////////////
   // HGVS Edit (without accession); e.g., c.76+3A>T
@@ -91,19 +75,11 @@ ometa SVN {
   cUnphasedVariant = listOf(#cPhasedVariants, '(;)'):phasedVariants ?(phasedVariants.length>1) -> new UnphasedVariant({variants:phasedVariants}),
   gUnphasedVariant = listOf(#gPhasedVariants, '(;)'):phasedVariants ?(phasedVariants.length>1) -> new UnphasedVariant({variants:phasedVariants}),
 
-  // UnphasedVariantPattern
-  cUnphasedVariantPattern = logicPattern(#cPhasedVariantPattern),
-  gUnphasedVariantPattern = logicPattern(#gPhasedVariantPattern),
-
   ////////////////////////////////////////////////////////////////////////////
   // PhasedVariants - trans or cis cisVariants
 
   cPhasedVariants = cTransVariant | cCisVariant,
   gPhasedVariants = gTransVariant | gCisVariant,
-
-  // PhasedVariant Patterns
-  cPhasedVariantPattern = cTransVariantPattern | cCisVariantPattern,
-  gPhasedVariantPattern = gTransVariantPattern | gCisVariantPattern,
 
   ////////////////////////////////////////////////////////////////////////////
   // TransVariant - cisVariant;cisVariant;cisVariant... edits are in trans
@@ -111,25 +87,13 @@ ometa SVN {
   cTransVariant = listOf(#cCisVariant, ';'):cisVariants ?(cisVariants.length>1) -> new TransVariant({variants:cisVariants}),
   gTransVariant = listOf(#gCisVariant, ';'):cisVariants ?(cisVariants.length>1) -> new TransVariant({variants:cisVariants}),
 
-  // TransVariant Patterns
-  cTransVariantPattern = logicPattern(#cCisVariantPattern),
-  gTransVariantPattern = logicPattern(#gCisVariantPattern),
-
   ////////////////////////////////////////////////////////////////////////////
   // CisVariant (aka allele) - [edit;edit;edit] edits are in cis
 
-  cisBracketPattern :elt =
-      ('[' listOf(elt,';'):edits ?(edits.length===1) ']' -> edits[0])
-    | ('[' listOf(elt,';'):edits ?(edits.length>1) ']' -> new CisVariant({variants:edits})),
+  cisBracketPattern :elt = '[' listOf(elt,';'):edits ']' -> new CisVariant({variants:edits}),
 
   cCisVariant = cisBracketPattern(#cSimpleVariant),
   gCisVariant = cisBracketPattern(#gSimpleVariant),
-
-  // CisVariant Patterns
-  cCisVariantSubPattern = cisBracketPattern(#cSimpleVariantPattern),
-  gCisVariantSubPattern = cisBracketPattern(#gSimpleVariantPattern),
-  cCisVariantPattern = logicPattern(#cCisVariantSubPattern),
-  gCisVariantPattern = logicPattern(#gCisVariantSubPattern),
 
   ////////////////////////////////////////////////////////////////////////////
   // SimpleVariant a single position with an optional edit (ref=>alt change)
@@ -150,20 +114,6 @@ ometa SVN {
     | '0':x '?' -> new SimpleVariant({pos:null, edit:x, uncertain:true})
     | '0':x -> new SimpleVariant({pos:null, edit:x, uncertain:false})
     | '?':x -> null,
-
-  // SimpleVariant Patterns
-  cSimpleVariantPattern = logicPattern(#cSimpleVariant),
-  gSimpleVariantPattern = logicPattern(#gSimpleVariant),
-
-  ////////////////////////////////////////////////////////////////////////////
-  // LogicPatterns -- allows and, or, not matching and logical grouping
-
-  logicPattern :pattern = andPattern(pattern) | orPattern(pattern) | notPattern(pattern) | apply(pattern) | groupedLogicPattern(pattern),
-  groupedLogicPattern :pattern = '{' logicPattern(pattern):expr '}' -> expr,
-  andPattern :pattern = logicExpr(pattern):lhs '&' logicPattern(pattern):rhs -> new AndExpr(lhs, rhs, pattern),
-  orPattern :pattern = logicExpr(pattern):lhs '^' logicPattern(pattern):rhs -> new OrExpr(lhs, rhs, pattern),
-  notPattern :pattern = '!' logicPattern(pattern):expr -> new NotExpr(expr, pattern),
-  logicExpr :pattern = apply(pattern):expr | groupedLogicPattern(pattern):expr | anything:expr ?(elements.isLogicExpr(expr, pattern)) -> expr,
 
   ////////////////////////////////////////////////////////////////////////////
   // Edits -- sequence-specific operations at a position
@@ -229,12 +179,12 @@ ometa SVN {
   defNInterval = (nPos:start '_' nPos:end -> new BaseInterval({start:start, end:end})) | (nPos:start -> start),
 
   // positions
-  cPos = defCPos | '(' defCPos:pos ')' -> pos.setUncertain(),
-  gPos = defGPos | '(' defGPos:pos ')' -> pos.setUncertain(),
-  mPos = defMPos | '(' defMPos:pos ')' -> pos.setUncertain(),
-  nPos = defNPos | '(' defNPos:pos ')' -> pos.setUncertain(),
-  pPos = defPPos | '(' defPPos:pos ')' -> pos.setUncertain(),
-  rPos = defRPos | '(' defRPos:pos ')' -> pos.setUncertain(),
+  cPos = defCPos | '(' defCPos:pos ')' -> new Uncertain(pos),
+  gPos = defGPos | '(' defGPos:pos ')' -> new Uncertain(pos),
+  mPos = defMPos | '(' defMPos:pos ')' -> new Uncertain(pos),
+  nPos = defNPos | '(' defNPos:pos ')' -> new Uncertain(pos),
+  pPos = defPPos | '(' defPPos:pos ')' -> new Uncertain(pos),
+  rPos = defRPos | '(' defRPos:pos ')' -> new Uncertain(pos),
 
   // definite positions
   defCPos = base:b offset:o -> new BaseOffsetPosition({base:b,offset:o,datum:constants.CDS_START})

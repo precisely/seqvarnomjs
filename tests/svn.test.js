@@ -1,10 +1,12 @@
 import { SVN } from 'src/svn';
-import { SequenceVariant, TransVariant, NARefAlt } from 'src/elements';
-import { UnphasedVariant, CisVariant, SimpleVariant, SequenceVariantPattern, OrExpr, AndExpr, NotExpr } from '../src/elements';
+import {
+  SequenceVariant, TransVariant, NARefAlt, Uncertain,
+  UnphasedVariant, CisVariant, SimpleVariant
+} from 'src/elements';
 
 describe('svn.ometa', function () {
   it('should read a simple nucleic acid variant', function () {
-    var result = SVN.matchAll('NC00001_1.11:g.123123T>C', 'svnVariant');
+    const result = SVN.matchAll('NC00001_1.11:g.123123T>C', 'svnVariant');
     expect(result).toBeInstanceOf(SequenceVariant);
     expect(result.ac).toEqual('NC00001_1.11');
     expect(result.type).toEqual('g');
@@ -15,8 +17,14 @@ describe('svn.ometa', function () {
     expect(result.variant.edit.alt).toEqual('C');
   });
 
+  it('should read a simple variant with uncertain position', function () {
+    const result = SVN.matchAll('NC00001_1.11:g.(123123)T>C', 'svnVariant');
+    expect(result.variant.pos).toBeInstanceOf(Uncertain);
+    expect(result.variant.pos.value).toEqual(123123);
+  });
+
   it('should read a wild-type variant', function () {
-    var result = SVN.matchAll('NC00001_1.11:g.123123=', 'svnVariant');
+    const result = SVN.matchAll('NC00001_1.11:g.123123=', 'svnVariant');
     expect(result).toBeInstanceOf(SequenceVariant);
     expect(result.ac).toEqual('NC00001_1.11');
     expect(result.type).toEqual('g');
@@ -27,7 +35,7 @@ describe('svn.ometa', function () {
 
   context('when provided with a representation of a trans variant', function() {
     context('when it is a heterozygous trans variant', function () {
-      var result;
+      let result;
       beforeEach(function () {
         result = SVN.matchAll('NC00001_1.11:g.[123123T>C];[123123=]', 'svnVariant');
       });
@@ -41,26 +49,32 @@ describe('svn.ometa', function () {
       });
 
       it('and the transvariant should contain two simple variants', function () {
-        var [variant1,variant2] = result.variant.variants;
-        expect(variant1).toBeInstanceOf(SimpleVariant);
-        expect(variant2).toBeInstanceOf(SimpleVariant);
-        expect(variant1.pos).toEqual(123123);
-        expect(variant1.edit).toBeInstanceOf(NARefAlt);
-        expect(variant1.edit.ref).toEqual('T');
-        expect(variant1.edit.alt).toEqual('C');
+        const [variant1,variant2] = result.variant.variants;
+        expect(variant1).toBeInstanceOf(CisVariant);
+        expect(variant2).toBeInstanceOf(CisVariant);
+        expect(variant1.variants).toHaveLength(1);
+        expect(variant2.variants).toHaveLength(1);
+        const simpleVariant1 = variant1.variants[0];
+        const simpleVariant2 = variant2.variants[0];
+        expect(simpleVariant1.pos).toEqual(123123);
+        expect(simpleVariant1.edit).toBeInstanceOf(NARefAlt);
+        expect(simpleVariant1.edit.ref).toEqual('T');
+        expect(simpleVariant1.edit.alt).toEqual('C');
 
-        expect(variant2).toBeInstanceOf(SimpleVariant);
-        expect(variant2.pos).toEqual(123123);
-        expect(variant2.edit).toBeNull();
+        expect(simpleVariant2).toBeInstanceOf(SimpleVariant);
+        expect(simpleVariant2.pos).toEqual(123123);
+        expect(simpleVariant2.edit).toBeNull();
       });
     });
 
     it('should read a wild type variant as a TransAllele type', function () {
-      var result = SVN.matchAll('NC00001_1.11:g.[123123=];[123123=]', 'svnVariant');
+      const result = SVN.matchAll('NC00001_1.11:g.[123123=];[123123=]', 'svnVariant');
       expect(result).toBeInstanceOf(SequenceVariant);
       expect(result.variant).toBeInstanceOf(TransVariant);
       expect(result.variant.variants).toHaveLength(2);
-      var [variant1, variant2] = result.variant.variants;
+      const [cisVariant1, cisVariant2] = result.variant.variants;
+      const variant1 = cisVariant1.variants[0];
+      const variant2 = cisVariant2.variants[0];
       expect(variant1.pos).toEqual(123123);
       expect(variant1.edit).toBeNull();
       expect(variant2.pos).toEqual(123123);
@@ -68,37 +82,38 @@ describe('svn.ometa', function () {
     });
 
     it('should read a tri-allelic variant as a TransVariant type', function () {
-      var result = SVN.matchAll('NC00001_1.11:g.[123123T>C];[123123T>G];[123123T>A]', 'svnVariant');
+      const result = SVN.matchAll('NC00001_1.11:g.[123123T>C];[123123T>G];[123123T>A]', 'svnVariant');
       expect(result).toBeInstanceOf(SequenceVariant);
       expect(result.variant).toBeInstanceOf(TransVariant);
       expect(result.variant.variants).toHaveLength(3);
-      var [variant1, variant2,variant3] = result.variant.variants;
-      expect(variant1.pos).toEqual(123123);
-      expect(variant1.edit.ref).toEqual('T');
-      expect(variant1.edit.alt).toEqual('C');
-      expect(variant2.edit.ref).toEqual('T');
-      expect(variant2.edit.alt).toEqual('G');
-      expect(variant3.edit.ref).toEqual('T');
-      expect(variant3.edit.alt).toEqual('A');
+      const [variant1, variant2,variant3] = result.variant.variants;
+      expect(variant1.variants[0]).toBeInstanceOf(SimpleVariant);
+      expect(variant1.variants[0].pos).toEqual(123123);
+      expect(variant1.variants[0].edit.ref).toEqual('T');
+      expect(variant1.variants[0].edit.alt).toEqual('C');
+      expect(variant2.variants[0].edit.ref).toEqual('T');
+      expect(variant2.variants[0].edit.alt).toEqual('G');
+      expect(variant3.variants[0].edit.ref).toEqual('T');
+      expect(variant3.variants[0].edit.alt).toEqual('A');
     });
 
     it('should read a variant with uncertain phases as an UnphasedVariant type', function () {
-      var result = SVN.matchAll('NC00001_1.11:g.[123123T>C](;)[123123T>G](;)[123123T>A]', 'svnVariant');
+      const result = SVN.matchAll('NC00001_1.11:g.[123123T>C](;)[123123T>G](;)[123123T>A]', 'svnVariant');
       expect(result).toBeInstanceOf(SequenceVariant);
       expect(result.variant).toBeInstanceOf(UnphasedVariant);
       expect(result.variant.variants).toHaveLength(3);
-      var [variant1, variant2,variant3] = result.variant.variants;
-      expect(variant1.pos).toEqual(123123);
-      expect(variant1.edit.ref).toEqual('T');
-      expect(variant1.edit.alt).toEqual('C');
-      expect(variant2.edit.ref).toEqual('T');
-      expect(variant2.edit.alt).toEqual('G');
-      expect(variant3.edit.ref).toEqual('T');
-      expect(variant3.edit.alt).toEqual('A');
+      const [variant1, variant2, variant3] = result.variant.variants;
+      expect(variant1.variants[0].pos).toEqual(123123);
+      expect(variant1.variants[0].edit.ref).toEqual('T');
+      expect(variant1.variants[0].edit.alt).toEqual('C');
+      expect(variant2.variants[0].edit.ref).toEqual('T');
+      expect(variant2.variants[0].edit.alt).toEqual('G');
+      expect(variant3.variants[0].edit.ref).toEqual('T');
+      expect(variant3.variants[0].edit.alt).toEqual('A');
     });
 
     context('parsing complex unphased variants with both cis and trans variants, the variant', function () {
-      var result;
+      let result;
       beforeEach(function() {
         result = SVN.matchAll('NC00001_1.11:g.[123123T>C;999A>G];[444C>T](;)[222T>G](;)[333T>A]', 'svnVariant');
       });
@@ -112,7 +127,7 @@ describe('svn.ometa', function () {
       });
 
       context('with child variants', function () {
-        var unphasedVariantChild1, unphasedVariantChild2, unphasedVariantChild3;
+        let unphasedVariantChild1, unphasedVariantChild2, unphasedVariantChild3;
         beforeEach(()=>{
           [unphasedVariantChild1, unphasedVariantChild2, unphasedVariantChild3] = result.variant.variants;
         });
@@ -120,20 +135,21 @@ describe('svn.ometa', function () {
         it('the second unphased variant should be parsed correctly', function () {
           // 'NC00001_1.11:g.[123123T>C;999A>G];[444C>T](;)[222T>G](;)[333T>A]'
           //                                               ^^^^^^^^
-          expect(unphasedVariantChild2).toBeInstanceOf(SimpleVariant);
-          expect(unphasedVariantChild2.pos).toEqual(222);
-          expect(unphasedVariantChild2.edit.ref).toEqual('T');
-          expect(unphasedVariantChild2.edit.alt).toEqual('G');
+          expect(unphasedVariantChild2).toBeInstanceOf(CisVariant);
+          expect(unphasedVariantChild2.type).toEqual('cis');
+          expect(unphasedVariantChild2.variants[0].pos).toEqual(222);
+          expect(unphasedVariantChild2.variants[0].edit.ref).toEqual('T');
+          expect(unphasedVariantChild2.variants[0].edit.alt).toEqual('G');
         });
 
-        it('the third unphased child variant is a simple variant', function () {
+        it('the third unphased child variant is a single cis variant', function () {
           // 'NC00001_1.11:g.[123123T>C;999A>G];[444C>T](;)[222T>G](;)[333T>A]'
           //                                                          ^^^^^^^^^
-          expect(unphasedVariantChild3).toBeInstanceOf(SimpleVariant);
-          expect(unphasedVariantChild3).toBeInstanceOf(SimpleVariant);
-          expect(unphasedVariantChild3.pos).toEqual(333);
-          expect(unphasedVariantChild3.edit.ref).toEqual('T');
-          expect(unphasedVariantChild3.edit.alt).toEqual('A');
+          expect(unphasedVariantChild3).toBeInstanceOf(CisVariant);
+          expect(unphasedVariantChild3).toBeInstanceOf(CisVariant);
+          expect(unphasedVariantChild3.variants[0].pos).toEqual(333);
+          expect(unphasedVariantChild3.variants[0].edit.ref).toEqual('T');
+          expect(unphasedVariantChild3.variants[0].edit.alt).toEqual('A');
         });
 
 
@@ -149,14 +165,16 @@ describe('svn.ometa', function () {
           });
 
           context('and those variants', function () {
-            var transSimpleVariant, transCisVariant;
+            let transSingleVariant, transCisVariant;
             it('should be a Cis and Simple variant, respectively', function () {
               // 'NC00001_1.11:g.[123123T>C;999A>G];[444C>T](;)[222T>G](;)[333T>A]'
               //                 ^^^^^^^^^^^^^^^^^^ ^^^^^^^^
 
-              [transCisVariant, transSimpleVariant] = unphasedVariantChild1.variants;
+              [transCisVariant, transSingleVariant] = unphasedVariantChild1.variants;
               expect(transCisVariant).toBeInstanceOf(CisVariant);
-              expect(transSimpleVariant).toBeInstanceOf(SimpleVariant);
+              expect(transCisVariant.type).toEqual('cis');
+              expect(transSingleVariant).toBeInstanceOf(CisVariant);
+              expect(transSingleVariant.variants).toHaveLength(1);
             });
 
             it('where the first cis variant contains two SimpleVariants', function () {
@@ -164,7 +182,7 @@ describe('svn.ometa', function () {
               //                  ^^^^^^^^^ ^^^^^^
 
               expect(transCisVariant.variants).toHaveLength(2);
-              var [v1,v2] = transCisVariant.variants;
+              const [v1,v2] = transCisVariant.variants;
               expect(v1).toBeInstanceOf(SimpleVariant);
               expect(v2).toBeInstanceOf(SimpleVariant);
 
@@ -184,6 +202,7 @@ describe('svn.ometa', function () {
             it('where the second cis variant contains one Simple Variant', function () {
               // 'NC00001_1.11:g.[123123T>C;999A>G];[444C>T](;)[222T>G](;)[333T>A]'
               //                                    ^^^^^^^^
+              const transSimpleVariant = transSingleVariant.variants[0];
               expect(transSimpleVariant).toBeInstanceOf(SimpleVariant);
               expect(transSimpleVariant.pos).toEqual(444);
               expect(transSimpleVariant.edit.ref).toEqual('C');
@@ -195,173 +214,49 @@ describe('svn.ometa', function () {
     });
   });
 
-  context('patterns', function () {
-    context('logicPattern', function () {
-
-    // { svnVariant } = pattern
-    // { svnVariant & svnVariant ^ svnVariant }
-    // { svn}
-    // var result = SVN.matchAll('111T>C^222A>G]^[333T>A^444G>A]', 'svnVariant');
-
-    });
-
-  });
-
   context('cisVariant rule', function () {
     it('should parse [variant] as a SimpleVariant', function () {
-      var cResult = SVN.matchAll('[123T>C]', 'cCisVariant');
-      expect(cResult).toBeInstanceOf(SimpleVariant);
+      const cResult = SVN.matchAll('[123T>C]', 'cCisVariant');
+      expect(cResult).toBeInstanceOf(CisVariant);
 
-      var gResult = SVN.matchAll('[123T>C]', 'gCisVariant');
-      expect(gResult).toBeInstanceOf(SimpleVariant);
+      const gResult = SVN.matchAll('[123T>C]', 'gCisVariant');
+      expect(gResult).toBeInstanceOf(CisVariant);
     });
 
     it('should parse [variant;variant] as a CisVariant', function() {
-      var cResult = SVN.matchAll('[123T>C;345A>G]', 'cCisVariant');
+      const cResult = SVN.matchAll('[123T>C;345A>G]', 'cCisVariant');
       expect(cResult).toBeInstanceOf(CisVariant);
 
-      var gResult = SVN.matchAll('[123T>C;345A>G]', 'gCisVariant');
+      const gResult = SVN.matchAll('[123T>C;345A>G]', 'gCisVariant');
       expect(gResult).toBeInstanceOf(CisVariant);
     });
   });
 
-  context('Logic Patterns', function () {
-    it('should parse a SimpleVariant OR pattern', function () {
-      var result = SVN.matchAll('111A>T^222C>G', 'gSimpleVariantPattern');
-      expect(result).toBeInstanceOf(OrExpr);
-      expect(result.pattern).toEqual('gSimpleVariant');
-      expect(result.expressions).toHaveLength(2);
-      expect(result.expressions[0]).toBeInstanceOf(SimpleVariant);
-      expect(result.expressions[0]).toBeInstanceOf(SimpleVariant);
-    });
+});
 
-    it('should parse a SimpleVariant AND pattern', function () {
-      var result = SVN.matchAll('111A>T&222C>G', 'gSimpleVariantPattern');
-      expect(result).toBeInstanceOf(AndExpr);
-      expect(result.pattern).toEqual('gSimpleVariant');
-      expect(result.expressions).toHaveLength(2);
-      expect(result.expressions[0]).toBeInstanceOf(SimpleVariant);
-      expect(result.expressions[0]).toBeInstanceOf(SimpleVariant);
-    });
-
-    it('should parse a SimpleVariant NOT pattern', function () {
-      var result = SVN.matchAll('!111A>T', 'gSimpleVariantPattern');
-      expect(result).toBeInstanceOf(NotExpr);
-      expect(result.pattern).toEqual('gSimpleVariant');
-      expect(result.expression).toBeInstanceOf(SimpleVariant);
-    });
-
-
-    it('should parse a SimpleVariant OR pattern with braces', function () {
-      var result = SVN.matchAll('{111A>T^222C>G}', 'gSimpleVariantPattern');
-      expect(result).toBeInstanceOf(OrExpr);
-      expect(result.pattern).toEqual('gSimpleVariant');
-      expect(result.expressions).toHaveLength(2);
-      expect(result.expressions[0]).toBeInstanceOf(SimpleVariant);
-      expect(result.expressions[0]).toBeInstanceOf(SimpleVariant);
-    });
-
-    it('should parse a SimpleVariant AND pattern with braces', function () {
-      var result = SVN.matchAll('{111A>T&222C>G}', 'gSimpleVariantPattern');
-      expect(result).toBeInstanceOf(AndExpr);
-      expect(result.pattern).toEqual('gSimpleVariant');
-      expect(result.expressions).toHaveLength(2);
-      expect(result.expressions[0]).toBeInstanceOf(SimpleVariant);
-      expect(result.expressions[0]).toBeInstanceOf(SimpleVariant);
-    });
-
-    it('should parse a SimpleVariant NOT pattern with surrounding braces', function () {
-      var result = SVN.matchAll('{!111A>T}', 'gSimpleVariantPattern');
-      expect(result).toBeInstanceOf(NotExpr);
-      expect(result.pattern).toEqual('gSimpleVariant');
-      expect(result.expression).toBeInstanceOf(SimpleVariant);
-    });
-
-    it('should parse a SimpleVariant NOT pattern with inner braces', function () {
-      var result = SVN.matchAll('!{111A>T}', 'gSimpleVariantPattern');
-      expect(result).toBeInstanceOf(NotExpr);
-      expect(result.pattern).toEqual('gSimpleVariant');
-      expect(result.expression).toBeInstanceOf(SimpleVariant);
-    });
-
-    it('should parse logic patterns in left=>right order', function () {
-      var result = SVN.matchAll('111A>T^222G>C&333T>C', 'gSimpleVariantPattern');
-      expect(result).toBeInstanceOf(OrExpr);
-      expect(result.pattern).toEqual('gSimpleVariant');
-      expect(result.expressions).toHaveLength(2);
-      var [lhs, rhs] = result.expressions;
-      expect(lhs).toBeInstanceOf(SimpleVariant);
-      expect(lhs.toString()).toEqual('111A>T');
-      expect(rhs).toBeInstanceOf(AndExpr);
-      expect(rhs.toString()).toEqual('222G>C&333T>C');
-    });
-
-    it('should parse a SimpleVariant AND(OR) pattern', function () {
-      var result = SVN.matchAll('{111A>T^222G>C}&333T>C', 'gSimpleVariantPattern');
-      expect(result).toBeInstanceOf(AndExpr);
-      expect(result.pattern).toEqual('gSimpleVariant');
-      expect(result.expressions).toHaveLength(2);
-      var [lhs, rhs] = result.expressions;
-      expect(lhs).toBeInstanceOf(OrExpr);
-      expect(lhs.toString()).toEqual('111A>T^222G>C');
-      expect(rhs.toString()).toEqual('333T>C');
-    });
-
-    it('should combine a sequence of and expressions', function () {
-      var result = SVN.matchAll('111A>T&222G>C&333T>C&444A>G', 'gSimpleVariantPattern');
-      expect(result).toBeInstanceOf(AndExpr);
-      expect(result.pattern).toEqual('gSimpleVariant');
-      expect(result.expressions).toHaveLength(4);
-      result.expressions.forEach(exp=>expect(exp).toBeInstanceOf(SimpleVariant));
-    });
-
-    it('should combine a sequence of or expressions', function () {
-      var result = SVN.matchAll('111A>T^222G>C^333T>C^444A>G', 'gSimpleVariantPattern');
-      expect(result).toBeInstanceOf(OrExpr);
-      expect(result.pattern).toEqual('gSimpleVariant');
-      expect(result.expressions).toHaveLength(4);
-      result.expressions.forEach(exp=>expect(exp).toBeInstanceOf(SimpleVariant));
-    });
-  });
-  context('Building a SequenceVariantPattern', function () {
-    it('should return a SequenceVariantPattern with an or expression in an allele', function () {
-      var result = SVN.matchAll('NC0001_01.11:g.[111A>T^222G>C]', 'svnVariantPattern');
-      expect(result).toBeInstanceOf(SequenceVariantPattern);
-      expect(result.variant).toBeInstanceOf(OrExpr);
-      expect(result.variant.expressions).toHaveLength(2);
-    });
-  });
-  context('when provided an expression containing hierarchical logic', function () {
-    var result;
-
-    beforeAll(function () {
-      result = SVN.matchAll('NC0001_01.11:g.[111A>T;222G>C];[333=;444A>C]^[555=;{666>G^777=}](;)[888=;999>C]^[000A>G]', 'svnVariant');
-    });
-
-    it('should produce the correct type of variant', function () {
-      expect(result).toBeInstanceOf(SequenceVariant);
-    });
-
-    it('should bind logic operators with lower precedence than other expressions', function () {
-
-        // NC0001_01.11:g.[111A>T;222G>C];[333=;444A>C]^[555=;{666>G^777=}](;)[888=;999>C]^[000A>G]', 'logic');
-        //                1)^^^^^^^^^^^^^^^^^^^^^^^^^^  2)^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ 3)^^^^^^
-        expect(result.variant).toBeInstanceOf(OrExpr);
-        expect(result.variant.expressions).toHaveLength(3);
-
-        var [variant1, variant2, variant3] = result.variant.expressions;
-        expect(variant1).toBeInstanceOf(TransVariant);
-        expect(variant1.toString()).toEqual('[111A>T;222G>C]');
-        console.log(variant2.toString());
-        expect(variant2).toBeInstanceOf(UnphasedVariant);
-        expect(variant2.variants).toHaveLength(2);
-        expect(variant2.variants[0]).toBeInstanceOf(CisVariant);
-        expect(variant2.variants[0].variants).toHaveLength(2);
-        expect(variant2.variants[0].variants[0].toString()).toEqual('666=');
-        expect(variant2.variants[0].variants[1]).toBeInstanceOf(OrExpr);
-        expect(variant2.toString()).toEqual('[666=;{777A>G^888=}](;)[333=;444T>C]');
-    });
-
+describe('toString', function () {
+  it('should stringify a simple nucleic acid variant', function () {
+    const result = SVN.matchAll('NC00001_1.11:g.123123T>C', 'svnVariant');
+    expect(result.toString()).toEqual('NC00001_1.11:g.123123T>C');
   });
 
+  it('should stringify a simple variant with uncertain position', function () {
+    const result = SVN.matchAll('NC00001_1.11:g.(123123)T>C', 'svnVariant');
+    expect(result.toString()).toEqual('NC00001_1.11:g.(123123)T>C');
+  });
+
+  it('should stringify a wild-type variant', function () {
+    const result = SVN.matchAll('NC00001_1.11:g.123123=', 'svnVariant');
+    expect(result.toString()).toEqual('NC00001_1.11:g.123123=');
+  });
+
+  it('should stringify a cis variant', function () {
+    const result = SVN.matchAll('NC00001_1.11:g.[123123=]', 'svnVariant');
+    expect(result.toString()).toEqual('NC00001_1.11:g.[123123=]');
+  });
+
+  it('should stringify an unphased variant', function () {
+    const result = SVN.matchAll('NC00001_1.11:g.[123123T>C](;)[123123=]', 'svnVariant');
+    expect(result.toString()).toEqual('NC00001_1.11:g.[123123T>C](;)[123123=]');
+  });
 });

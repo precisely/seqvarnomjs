@@ -19,14 +19,8 @@ export class SequenceVariant {
   }
 
   toString() {
-    return `${this.ac.toString()}:${this.type}${this.variant.toString()}`;
+    return `${this.ac.toString()}:${this.type}.${this.variant.toString()}`;
   }
-}
-
-export class SequenceVariantPattern extends SequenceVariant {}
-
-function findMatchInArray(array, pattern) {
-  return array.some(elt=>elt.match(pattern));
 }
 
 export class UnphasedVariant {
@@ -43,12 +37,13 @@ export class UnphasedVariant {
       // find a match amongst the phased variants
       return !pattern.variants || pattern.variants.map(pvariant=>findMatchInArray(this.variants, pvariant));
     } else {
-      // see if any of the phased variants match this pattern     return this.variants.some(variant=>variant.match(pattern));
+      // see if any of the phased variants match this pattern
+      return this.variants.some(variant=>variant.match(pattern));
     }
   }
 
   toString() {
-    return this.variants(v=>toString()).join('(;)');
+    return this.variants.map(v => v.toString()).join('(;)');
   }
 }
 
@@ -62,7 +57,7 @@ export class TransVariant {
   }
 
   toString() {
-    return this.variants(v=>v.toString()).join(';');
+    return this.variants.map(v=>v.toString()).join(';');
   }
 }
 
@@ -76,7 +71,7 @@ export class CisVariant { // aka Allele
   }
 
   toString() {
-    return '[' + this.variants(v=>v.toString()).join(';') + ']';
+    return '[' + this.variants.map(v=>v.toString()).join(';') + ']';
   }
 }
 
@@ -87,19 +82,13 @@ export class SimpleVariant {
     this.uncertain = uncertain || false;
   }
 
-  setUncertain() {
-    this.uncertain = this.uncertain;
-  }
-
   get type() {
-    return 'posedit';
+    return 'simple';
   }
 
   toString() {
-    if (this.uncertain) {
-      return `(${this.pos.toString()}${this.edit.toString()})`;
-    } else {
-      return `${this.pos.toString()}${this.edit.toString()}`;
-    }
+    const edit = this.edit || '=';
+    const pos = this.pos || 'error';
+    return `${pos.toString()}${edit.toString()}`;
   }
 }

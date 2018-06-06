@@ -14,7 +14,6 @@ export class HGVSPosition {
   toString() {
     return `${this.ac.toString()}:${this.type}${this.variant.toString()}`;
   }
-
 }
 
 export class Interval {
@@ -60,5 +59,15 @@ export class AAPosition {
     this.base = base;
     this.aa = aa;
     this.datum = datum;
+  }
+}
+
+export class Uncertain {
+  constructor(value) {
+    this.value = value;
+  }
+
+  toString() {
+    return `(${this.value.toString()})`;
   }
 }
