@@ -108,7 +108,7 @@ describe('matching a SequenceVariant to a pattern', function () { // eslint-disa
     expect(variant.matches(pattern)).toBeTruthy();
   });
 
-  it('should match part of a complex variant', function () {
+  it.only('should match part of a complex variant', function () {
     const pattern = parse('NC0001_1.11:g.[123T>C](;)[345G>A]');
     const variant = parse('NC0001_1.11:g.[678A>T;345G>A];[123T>C];[999=]');
 

@@ -1,4 +1,4 @@
-import { matches, matchesVariant } from './matcher';
+import { matches } from './matcher';
 
 export class SequenceVariant {
   constructor({ ac, type, variant }) {
@@ -72,7 +72,8 @@ export class CisVariant { // aka Allele
 
 
   matches(pattern) {
-    return matchesVariant(this, pattern);
+    return (pattern instanceof CisVariant || pattern instanceof SimpleVariant)
+      && matchesVariant(this, pattern);
   }
 }
 
@@ -94,12 +95,69 @@ export class SimpleVariant {
   }
 
   matches(pattern) {
-    debugger;
     return (
       pattern instanceof SimpleVariant
       && matches(this.pos, pattern.pos)
       && matches(this.edit, pattern.edit)
       && matches(this.uncertain, pattern.uncertain)
     );
+  }
+}
+
+const VariantClassOrder = [SimpleVariant, CisVariant, UnphasedVariant, TransVariant];
+
+export function variantOrder(variant, pattern) {
+  const variantOrder = VariantClassOrder.indexOf(variant.constructor);
+  const patternOrder = VariantClassOrder.indexOf(pattern.constructor);
+
+  if (variantOrder >= 0 && patternOrder >=0) {
+    return variantOrder - patternOrder;
+  } else {
+    throw new Error('boo')
+  }
+}
+
+
+var matchesVariantDepth = 0; // for debugging
+/**
+ *
+ * @param {*} variant
+ * @param {*} patternVariant
+ * @param {(variant, pattern) => -1|0|1} comparator
+ *   - returns 0 if classes are identical, 1 if variant has a class which encompasses the pattern class
+ *
+ */
+export function matchesVariant(variant, patternVariant) {
+  const order = variantOrder(variant, patternVariant);
+  console.log(`${'\t'.repeat(matchesVariantDepth)}matchesVariant(${variant.toString()}, ${patternVariant.toString()})`);
+  matchesVariantDepth++;
+  if (order === 0) {
+    // if they are of the same class...
+    const result = (
+      // either pattern has no variants to check
+      !patternVariant.variants
+      // or we can find a match for each subvariant in the pattern
+      || patternVariant.variants.every(
+          pv => variant.variants.find(v => v.matches(pv))
+      ) // terminates at SimpleVariant
+    );
+    console.log(`${'\t'.repeat()} (order==0)=>${result}`);
+    console.flush();
+    matchesVariantDepth--;
+    return result;
+  } else if (order > 0) { // variant is higher order than pattern...
+    // see if one of the variant's subvariants matches the pattern...
+    const result = variant.variants && variant.variants.some(variant => matchesVariant(variant, patternVariant));
+    console.log(`${'\t'.repeat()} (order>0) =>${result}`);
+    console.flush();
+    matchesVariantDepth--;
+    return result;
+
+  } else {
+    // variant is lower or unknown order
+    // this means there is no way the variant could contain the pattern
+    console.log(`${'\t'.repeat()} (lower order) =>${order}`);
+    matchesVariantDepth--;
+    return false;
   }
 }
