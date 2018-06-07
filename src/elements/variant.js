@@ -1,4 +1,4 @@
-import { matches, matchesVariant } from './matcher';
+import { matches } from './matcher';
 
 export class SequenceVariant {
   constructor({ ac, type, variant }) {
@@ -21,8 +21,19 @@ export class SequenceVariant {
   }
 }
 
-export class UnphasedVariant {
+export class RelativeVariant {
+  _findMatchInsideOf() {
+    throw new Error('Method _findMatchInsideOf must be implemented on subclasses of RelativeVariant');
+  }
+
+  matches(pattern) {
+    return pattern._findMatchInsideOf(this);
+  }
+}
+
+export class UnphasedVariant extends RelativeVariant {
   constructor({ variants }) {
+    super();
     this.variants = variants;
   }
 
@@ -34,13 +45,17 @@ export class UnphasedVariant {
     return this.variants.map(v => v.toString()).join('(;)');
   }
 
-  matches(pattern) {
-    return matchesVariant(this, pattern);
+  _findMatchInsideOf(other) {
+    if (other instanceof UnphasedVariant || other instanceof TransVariant || other instanceof CisVariant) {
+      return matchesSameClassVariant(this, other);
+    }
+    return false;
   }
 }
 
-export class TransVariant {
+export class TransVariant extends RelativeVariant {
   constructor({ variants }) {
+    super();
     this.variants = variants;
   }
 
@@ -52,13 +67,14 @@ export class TransVariant {
     return this.variants.map(v=>v.toString()).join(';');
   }
 
-  matches(pattern) {
-    return matchesVariant(this, pattern);
+  _findMatchInsideOf(other) {
+    return other instanceof TransVariant && matchesSameClassVariant(this, other);
   }
 }
 
-export class CisVariant { // aka Allele
+export class CisVariant extends RelativeVariant { // aka Allele
   constructor({ variants }) {
+    super();
     this.variants = variants;
   }
 
@@ -70,9 +86,14 @@ export class CisVariant { // aka Allele
     return '[' + this.variants.map(v=>v.toString()).join(';') + ']';
   }
 
-
-  matches(pattern) {
-    return matchesVariant(this, pattern);
+  _findMatchInsideOf(other) {
+    if (other instanceof CisVariant) {
+      return matchesSameClassVariant(this, other);
+    } else if (other instanceof TransVariant) {
+      return matchesInternalVariant(this, other);
+    } else {
+      return false;
+    }
   }
 }
 
@@ -101,4 +122,24 @@ export class SimpleVariant {
       && matches(this.uncertain, pattern.uncertain)
     );
   }
+}
+
+/**
+ * If variant and patternVariant are the same class:
+ */
+export function matchesSameClassVariant(patternVariant, variant) {
+  return !patternVariant.variants // either pattern has no variants to check
+    ||
+    patternVariant.variants.every( // or we can find a match for each subvariant in the pattern
+      pv => variant.variants.find(v => v.matches(pv))
+    );
+}
+
+/**
+ * If the variant could contain the pattern
+ */
+export function matchesInternalVariant(patternVariant, variant) {
+  return variant.variants && variant.variants.some(
+    variant => variant.matches(patternVariant)
+  );
 }
