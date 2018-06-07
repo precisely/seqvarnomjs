@@ -95,7 +95,7 @@ describe('matching a SequenceVariant to a pattern', function () {
     const variant = parse('NC0001_1.11:g.[123T>C](;)[345G>A]');
     expect(variant.matches(pattern)).toBeTruthy();
   });
-  it('should match an unphased variant with differently ordered sub variants variants', function () {
+  it('should match an unphased variant with differently ordered sub variants', function () {
     const pattern = parse('NC0001_1.11:g.[345G>A](;)[123T>C]');
     const variant = parse('NC0001_1.11:g.[123T>C](;)[345G>A]');
     expect(variant.matches(pattern)).toBeTruthy();
