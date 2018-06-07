@@ -30,7 +30,9 @@ ometa SVN {
   ////////////////////////////////////////////////////////////////////////////
   // SequenceVariant - an accession number, a type and a variant
 
-  svnVariant = gSeqVariant | mSeqVariant | cSeqVariant | nSeqVariant  | rSeqVariant | pSeqVariant,
+  EOF = spaces end,
+
+  svnVariant = (gSeqVariant | mSeqVariant | cSeqVariant | nSeqVariant  | rSeqVariant | pSeqVariant):v EOF -> v,
 
   cSeqVariant = accn:ac ':' 'c':type '.' (cUnphasedVariant | cTransVariant | cCisVariant | cSimpleVariant):variant
               -> new SequenceVariant({ac:ac, type:type, variant:variant}),

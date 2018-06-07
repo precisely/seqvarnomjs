@@ -1,3 +1,4 @@
+import { matches, matchesVariant } from './matcher';
 
 export class SequenceVariant {
   constructor({ ac, type, variant }) {
@@ -6,20 +7,17 @@ export class SequenceVariant {
     this.variant = variant;
   }
 
-  match(pattern) {
-    if (pattern instanceof SequenceVariant) {
-      return (
-        this.ac === other.ac &&
-        this.type === other.type &&
-        (!pattern.variant || this.variant.match(pattern.variant))
-      );
-    } else if (this.variant) {
-      return this.variant.match(pattern);
-    }
-  }
-
   toString() {
     return `${this.ac.toString()}:${this.type}.${this.variant.toString()}`;
+  }
+
+  matches(pattern) {
+    return (
+      pattern instanceof SequenceVariant
+      && matches(this.ac, pattern.ac)
+      && matches(this.type, pattern.type)
+      && matches(this.variant, pattern.variant)
+    );
   }
 }
 
@@ -32,18 +30,12 @@ export class UnphasedVariant {
     return 'unphased';
   }
 
-  match(pattern) {
-    if (pattern instanceof UnphasedVariant) {
-      // find a match amongst the phased variants
-      return !pattern.variants || pattern.variants.map(pvariant=>findMatchInArray(this.variants, pvariant));
-    } else {
-      // see if any of the phased variants match this pattern
-      return this.variants.some(variant=>variant.match(pattern));
-    }
-  }
-
   toString() {
     return this.variants.map(v => v.toString()).join('(;)');
+  }
+
+  matches(pattern) {
+    return matchesVariant(this, pattern);
   }
 }
 
@@ -59,6 +51,10 @@ export class TransVariant {
   toString() {
     return this.variants.map(v=>v.toString()).join(';');
   }
+
+  matches(pattern) {
+    return matchesVariant(this, pattern);
+  }
 }
 
 export class CisVariant { // aka Allele
@@ -72,6 +68,11 @@ export class CisVariant { // aka Allele
 
   toString() {
     return '[' + this.variants.map(v=>v.toString()).join(';') + ']';
+  }
+
+
+  matches(pattern) {
+    return matchesVariant(this, pattern);
   }
 }
 
@@ -90,5 +91,15 @@ export class SimpleVariant {
     const edit = this.edit || '=';
     const pos = this.pos || 'error';
     return `${pos.toString()}${edit.toString()}`;
+  }
+
+  matches(pattern) {
+    debugger;
+    return (
+      pattern instanceof SimpleVariant
+      && matches(this.pos, pattern.pos)
+      && matches(this.edit, pattern.edit)
+      && matches(this.uncertain, pattern.uncertain)
+    );
   }
 }

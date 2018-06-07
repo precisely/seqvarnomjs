@@ -38,12 +38,28 @@ export class Interval {
         return `${this.start}_${this.end}`;
     }
   }
+
+  matches(pattern) {
+    return (
+      pattern instanceof Interval
+      && matches(this.start, pattern.start)
+      && matches(this.end, pattern.end)
+    );
+  }
 }
 
 export class BaseOffsetPosition {
   constructor({ base, offset }) {
     this.base = base;
     this.offset = offset;
+  }
+
+  matches(pattern) {
+    return (
+      pattern instanceof BaseOffsetPosition
+      && matches(this.base, pattern.base)
+      && matches(this.offset, pattern.offset)
+    );
   }
 }
 
@@ -52,6 +68,14 @@ export class BaseOffsetInterval {
     this.start = start;
     this.end = end;
   }
+
+  matches(pattern) {
+    return (
+      pattern instanceof BaseOffsetInterval
+      && matches(this.start, pattern.start)
+      && matches(this.end, pattern.end)
+    );
+  }
 }
 
 export class AAPosition {
@@ -59,6 +83,15 @@ export class AAPosition {
     this.base = base;
     this.aa = aa;
     this.datum = datum;
+  }
+
+  matches(pattern) {
+    return (
+      pattern instanceof AAPosition
+      && matches(this.base, pattern.base)
+      && matches(this.aa, pattern.aa)
+      && matches(this.datum, pattern.datum)
+    );
   }
 }
 
@@ -69,5 +102,12 @@ export class Uncertain {
 
   toString() {
     return `(${this.value.toString()})`;
+  }
+
+  matches(pattern) {
+    return (
+      pattern instanceof Uncertain
+      && matches(this.value, pattern.value)
+    );
   }
 }

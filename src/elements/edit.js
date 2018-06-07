@@ -1,3 +1,5 @@
+import { matches } from './matcher';
+
 export class Edit {
 }
 
@@ -11,7 +13,7 @@ export class NARefAlt extends Edit {
   get type() {
     let editType;
     if (this.ref !== null && this.alt !== null) {
-      if (this.ref === this.alt) {
+      if (matches(this.ref, this.alt)) {
         editType = 'identity';
       } else if (this.ref.length === 1 && this.alt.length === 1) {
           editType = 'sub';
@@ -41,6 +43,11 @@ export class NARefAlt extends Edit {
         throw new Error(`Unknown Edit type ${this.type}`);
     }
   }
+
+  matches(pattern) {
+    return pattern instanceof NARefAlt && matches(this.ref, pattern.ref) && matches(this.alt, pattern.alt);
+  }
+
 }
 
 // duplicate
@@ -58,6 +65,10 @@ export class Dup extends Edit {
   get type() {
     return 'dup';
   }
+
+  matches(pattern) {
+    return pattern instanceof Dup && matches(this.ref, pattern.ref) && matches(this.uncertain, pattern.uncertain);
+  }
 }
 
 // inversion
@@ -69,6 +80,10 @@ export class Inv extends Edit {
 
   get type() {
     return 'inv';
+  }
+
+  matches(pattern) {
+    return pattern instanceof Inv && matches(this.ref, pattern.ref);
   }
 }
 
@@ -84,7 +99,7 @@ export class AARefAlt extends Edit {
   get type() {
     let editType;
     if (this.ref !== null && this.alt !== null) {
-      if (this.ref === this.alt) {
+      if (matches(this.ref, this.alt)) {
         editType = 'identity';
       } else if (this.ref.length === 1 && this.alt.length === 1) {
           editType = 'sub';
@@ -97,6 +112,10 @@ export class AARefAlt extends Edit {
       editType = 'ins';
     }
     return editType;
+  }
+
+  matches(pattern) {
+    return pattern instanceof AARefAlt && matches(this.ref, pattern.ref) && matches(this.alt, pattern.alt);
   }
 }
 
@@ -116,6 +135,17 @@ export class AAExt extends Edit {
     this.aaterm = aaterm;
     this.length = length;
     this.uncertain = uncertain;
+  }
+
+  matches(pattern) {
+    return (
+      pattern instanceof AAExt
+      && matches(this.ref, pattern.ref)
+      && matches(this.alt, pattern.alt)
+      && matches(this.aaterm, pattern.aaterm)
+      && matches(this.length, pattern.length)
+      && matches(this.uncertain, pattern.uncertain)
+    );
   }
 }
 
@@ -143,6 +173,16 @@ export class AAFs extends Edit {
   get type() {
     return 'fs';
   }
+
+  matches(pattern) {
+    return (
+      pattern instanceof AAFs
+      && matches(this.ref, pattern.ref)
+      && matches(this.alt, pattern.alt)
+      && matches(this.length, pattern.length)
+      && matches(this.uncertain, pattern.uncertain)
+    );
+  }
 }
 
 /**
@@ -165,6 +205,15 @@ export class Conv extends Edit {
   get type() {
     return 'conv';
   }
+
+  matches(pattern) {
+    return (
+      pattern instanceof Conv
+      && matches(this.framAc, pattern.fromAc)
+      && matches(this.fromType, pattern.fromType)
+      && matches(this.fromPos, pattern.fromPos)
+    );
+  }
 }
 
 export class NACopy extends Edit {
@@ -176,6 +225,14 @@ export class NACopy extends Edit {
 
   get type() {
     return 'copy';
+  }
+
+  matches(pattern) {
+    return (
+      pattern instanceof NACopy
+      && matches(this.copy, pattern.copy)
+      && matches(this.uncertain, pattern.uncertain)
+    );
   }
 }
 
@@ -190,5 +247,15 @@ export class Repeat extends Edit {
 
   get type() {
     return 'repeat';
+  }
+
+  matches(pattern) {
+    return (
+      pattern instanceof Repeat
+      && matches(this.ref, pattern.ref)
+      && matches(this.min, pattern.min)
+      && matches(this.min, pattern.max)
+      && matches(this.uncertain, pattern.uncertain)
+    );
   }
 }
