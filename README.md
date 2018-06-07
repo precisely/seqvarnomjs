@@ -4,6 +4,26 @@
 
 Javascript parser for [Sequence Variant Nomenclature](http://varnomen.hgvs.org/ ).
 
+
+## Quick Start
+
+Note: this is a private repo hosted on Github, so you need to:
+```shell
+yarn install git@github.com/precisely/seqvarnomjs
+```
+
+## Example
+```javascript
+var svn = require('seqvarnomjs');
+
+var pattern = svn.parse('NC0001_1.11:g.[111T>G^222A>G]');
+var genotype = svn.parse('NC0001_1.11:g.111T>G');
+
+svn.match(pattern, genotype); // => true
+```
+
+## Details
+
 This library interprets SVN strings such as:
 
 * simple variants `NC00001_1.11:g.111T>G`
@@ -16,29 +36,18 @@ This library interprets SVN strings such as:
    - 111T>G and 222A>G may be on same chromosome copy or different ones
 * complex variants `NC0001_1.11:g.[111T>G;222A>G];[333=](;)[444T>A];[555G>A]`
 
-We add extensions to the existing standard which allows us to perform pattern matching using logic operators:
-
-* OR operator `^`
-* AND operator `&`
-* GROUPING operator `{}`
-
 E.g.,
 
-* match either simple variant `111T>G` or `222A>G`
-  `NC0001_1.11:g.[111T>G^222A>G]`
-* match a simple variant on one chromosome or another
-  `{NC0001_1.11:g.111T>G}^{NC0002_2.11:g.222T>G}`
-* match a complex condition ((111 or 222) and (333 or 444))
-  `NC0001_1.11:g.[{111T>G^222T>G}&{333>T>G^444T>G}]`
+* match a variant:
+  ```js
+  const variant = parse('NC0001_1.11:g.[111T>G]');
+  const pattern = parse('NC0001_1.11:g.[111T>G]');
+  variant.matches(pattern); // => true
+  ```
+* match a part of a variant:
+  ```js
+  const variant = parse('NC0001_1.11:g.[111T>G]');
+  const pattern = parse('NC0001_1.11:g.[111T>G;222=](;)[333G>C;111=]');
+  variant.matches(pattern); // => true
+  ```
 
-## API
-
-WIP
-```javascript
-var svn = require('seqvarnomjs');
-
-var pattern = svn.parse('NC0001_1.11:g.[111T>G^222A>G]');
-var genotype = svn.parse('NC0001_1.11:g.111T>G');
-
-svn.match(pattern, genotype); // => true
-```
