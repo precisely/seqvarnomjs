@@ -1,11 +1,16 @@
 {
   "name": "seqvarnomjs",
+  "private": true,
   "version": "1.0.0",
   "description": "",
-  "main": "index.js",
+  "main": "lib/index.js",
+  "files": [
+    "lib"
+  ],
   "scripts": {
     "test": "yarn build && jest",
     "build": "rm -f src/svn.js && ometajs2js -i src/svn.ometa -o src/svn.js",
+    "prepare": "rm -frd lib && mkdir lib && yarn build && babel src -d lib",
     "lint": "eslint src/**/*.js test/**/*.js"
   },
   "author": "",
