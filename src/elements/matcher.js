@@ -18,7 +18,6 @@ export function matches(obj, pattern) {
 
 
 export function matchesVariant(variant, patternVariant) {
-  debugger;
   if (sameClass(patternVariant, variant)) {
     // if they are of the same class...
     const result = (

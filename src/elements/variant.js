@@ -94,7 +94,6 @@ export class SimpleVariant {
   }
 
   matches(pattern) {
-    debugger;
     return (
       pattern instanceof SimpleVariant
       && matches(this.pos, pattern.pos)
