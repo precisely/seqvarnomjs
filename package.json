@@ -1,20 +1,26 @@
 {
   "name": "seqvarnomjs",
+  "private": true,
   "version": "1.0.0",
   "description": "",
-  "main": "index.js",
+  "main": "lib/index.js",
+  "files": [
+    "lib"
+  ],
   "scripts": {
     "test": "yarn build && jest",
-    "build": "ometajs2js -b -i src/svn.ometa -o src/svn.js",
+    "build": "rm -f src/svn.js && ometajs2js -i src/svn.ometa -o src/svn.js",
+    "prepare": "rm -frd lib && mkdir lib && yarn build && babel src -d lib",
     "lint": "eslint src/**/*.js test/**/*.js"
   },
   "author": "",
   "license": "UNLICENSED",
   "dependencies": {
     "lodash": "^4.17.5",
-    "ometajs": "^4.0.0"
+    "ometa-js": "^1.4.2"
   },
   "devDependencies": {
+    "babel-cli": "^6.26.0",
     "babel-core": "^6.26.0",
     "babel-eslint": "^8.2.2",
     "babel-jest": "^22.4.1",
