@@ -16,8 +16,8 @@ yarn install git@github.com/precisely/seqvarnomjs
 ```javascript
 var svn = require('seqvarnomjs');
 
-var pattern = svn.parse('NC0001_1.11:g.[111T>G^222A>G]');
-var genotype = svn.parse('NC0001_1.11:g.111T>G');
+var pattern = svn.parse('NC0001_1.11:g.111T>G');
+var genotype = svn.parse('NC0001_1.11:g.[111T>G];[111=]');
 
 svn.match(pattern, genotype); // => true
 ```
@@ -40,14 +40,14 @@ E.g.,
 
 * match a variant:
   ```js
-  const variant = parse('NC0001_1.11:g.[111T>G]');
+  const genotype = parse('NC0001_1.11:g.[111T>G]');
   const pattern = parse('NC0001_1.11:g.[111T>G]');
-  variant.matches(pattern); // => true
+  genotype.matches(pattern); // => true
   ```
 * match a part of a variant:
   ```js
-  const variant = parse('NC0001_1.11:g.[111T>G]');
-  const pattern = parse('NC0001_1.11:g.[111T>G;222=](;)[333G>C;111=]');
-  variant.matches(pattern); // => true
+  const genotype = parse('NC0001_1.11:g.[111T>G;222=](;)[333G>C;111=]');
+  const pattern = parse('NC0001_1.11:g.[111T>G]');
+  genotype.matches(pattern); // => true
   ```
 
