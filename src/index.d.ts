@@ -1,5 +1,5 @@
 export interface Variant {
-  match(pattern: Variant): boolean;
+  matches(pattern: Variant): boolean;
   toString(): string;
 }
 export function parse(svn: string): Variant;
