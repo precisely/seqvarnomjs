@@ -2,10 +2,9 @@ import { VariantGraph } from '../../src/elements/variant-graph';
 
 describe('VariantGraph', function () {
   describe('addVariants', function () {
-
     describe('given a single variant,', function () {
-      const vg = new VariantGraph();
-      beforeAll(() => vg.addVariants(['a'], 'foo'));
+      let vg;
+      beforeAll(() => vg = new VariantGraph(['a'], 'foo'));
 
       it('should produce a matrix with one unconnected node', function () {
         expect(vg.adjacencyMatrix).toEqual([[0]]);
@@ -21,8 +20,8 @@ describe('VariantGraph', function () {
     });
 
     describe('given two variants', function () {
-      const vg = new VariantGraph();
-      beforeAll(() => vg.addVariants(['a', 'b'], 'foo'));
+      let vg;
+      beforeAll(() => vg = new VariantGraph(['a', 'b'], 'foo'));
 
       it('should have three nodes, two variants and an edge', function () {
         expect(vg.nodes).toEqual(['a','b','foo']);
@@ -44,10 +43,10 @@ describe('VariantGraph', function () {
     });
 
     describe('when a variant is added to two existing variants,', function () {
-      const vg = new VariantGraph();
+      let vg;
       beforeAll(() => {
-        vg.addVariants(['a', 'b'], 'foo');
-        vg.addVariants(['c'], 'bar');
+        vg = new VariantGraph(['a', 'b'], 'foo');
+        vg.add(new VariantGraph(['c'], 'bar'), 'bar');
       });
 
       it('should add three nodes, the new variant and two new edges', function () {
@@ -67,10 +66,10 @@ describe('VariantGraph', function () {
     });
 
     describe('when three variants are added to two existing variants,', function () {
-      const vg = new VariantGraph();
+      let vg;
       beforeAll(() => {
-        vg.addVariants(['a', 'b'], 'foo');
-        vg.addVariants(['c','d','e'], 'bar');
+        vg = new VariantGraph(['a', 'b'], 'foo');
+        vg.add(new VariantGraph(['c','d','e'], 'bar'), 'bar');
       });
 
       it('should add three nodes, the new variant and two new edges', function () {
@@ -110,6 +109,44 @@ describe('VariantGraph', function () {
         ]);
 
       });
+    });
+  });
+  describe('matches', function () {
+    it('should match two identical graphs', function () {
+      const graph = new VariantGraph(['a', 'b'], 'foo');
+      const pattern = new VariantGraph(['a', 'b'], 'foo');
+      expect(graph.matches(pattern)).toBeTruthy();
+    });
+
+    it('should match a larger graph with a smaller pattern', function () {
+      const graph = new VariantGraph(['a', 'b'], 'foo');
+      graph.add(new VariantGraph(['c','d','e'], 'bar'));
+      const pattern = new VariantGraph(['a', 'b'], 'foo');
+      expect(graph.matches(pattern)).toBeTruthy();
+    });
+
+    it('should not match graphs with different nodes', function () {
+      const graph = new VariantGraph(['a', 'b'], 'foo');
+      const pattern = new VariantGraph(['c', 'd'], 'foo');
+      expect(graph.matches(pattern)).toBeFalsy();
+    });
+
+    it('should not match graphs with different edges', function () {
+      const graph = new VariantGraph(['a', 'b'], 'foo');
+      const pattern = new VariantGraph(['a', 'b'], 'bar');
+      expect(graph.matches(pattern)).toBeFalsy();
+    });
+
+    it('should match two graphs containing the same nodes but no edges', function () {
+      const graph = new VariantGraph(['e','d','c','a','b']);
+      const pattern = new VariantGraph(['a', 'b','c','d','e']);
+      expect(graph.matches(pattern)).toBeTruthy();
+    });
+
+    it('should no match two graphs containing no edges and with different nodes', function () {
+      const graph = new VariantGraph(['z','d','c','a','b']);
+      const pattern = new VariantGraph(['a', 'b','c','d','e']);
+      expect(graph.matches(pattern)).toBeFalsy();
     });
   });
 });

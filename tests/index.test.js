@@ -1,5 +1,5 @@
 import { parse } from '../src/';
-import { SequenceVariant } from '../src/elements';
+import { SequenceVariant, NARefAlt } from '../src/elements';
 
 describe('parsing', function () {
   it('should return a SequenceVariant object when given a string', function () {
@@ -95,6 +95,19 @@ describe('matching a SequenceVariant to a pattern', function () { // eslint-disa
     const variant = parse('NC0001_1.11:g.[123T>C](;)[345G>A]');
     expect(variant.matches(pattern)).toBeTruthy();
   });
+
+  it('should not match a heterozygote to a homozygote pattern', function () {
+    const pattern = parse('NC0001_1.11:g.[123T>C];[123T>C]');
+    const variant = parse('NC0001_1.11:g.[123=];[123T>C]');
+    expect(variant.matches(pattern)).toBeFalsy();
+  });
+
+  it('should not match a homozygote to a heterozygote pattern', function () {
+    const pattern = parse('NC0001_1.11:g.[123T>C];[123=]');
+    const variant = parse('NC0001_1.11:g.[123=];[123=]');
+    expect(variant.matches(pattern)).toBeFalsy();
+  });
+
   it('should match an unphased variant with differently ordered sub variants', function () {
     const pattern = parse('NC0001_1.11:g.[345G>A](;)[123T>C]');
     const variant = parse('NC0001_1.11:g.[123T>C](;)[345G>A]');
@@ -123,6 +136,7 @@ describe('matching a SequenceVariant to a pattern', function () { // eslint-disa
   });
 
   it('should match an unphased variant to a cis variant', function () {
+    debugger;
     const pattern = parse('NC0001_1.11:g.[123T>C](;)[345G>A]');
     const variant = parse('NC0001_1.11:g.[678A>T;345G>A;123T>C];[999=]');
 
