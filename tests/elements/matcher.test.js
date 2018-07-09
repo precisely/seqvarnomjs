@@ -42,7 +42,6 @@ describe('matches', function () {
   });
 
   it('should not match a wild-type SimpleVariant with a refAlt SimpleVariant', function () {
-    debugger;
     expect(matches(
       new SimpleVariant({ pos: 100 }),
       new SimpleVariant({ pos: 100, edit: new NARefAlt({ ref: 'A', alt: 'T' }) })
@@ -50,7 +49,6 @@ describe('matches', function () {
   });
 
   it('should not match the same refAlt at a different location ', function () {
-    debugger;
     expect(matches(
       new SimpleVariant({ pos: 200, edit: new NARefAlt({ ref: 'A', alt: 'T' }) }),
       new SimpleVariant({ pos: 100, edit: new NARefAlt({ ref: 'A', alt: 'T' }) })

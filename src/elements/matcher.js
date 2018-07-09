@@ -5,7 +5,6 @@ export function sameClass(x, y) {
 }
 
 export function matches(obj, pattern) {
-  debugger;
   return (
     obj === pattern
     ||

@@ -136,7 +136,6 @@ describe('matching a SequenceVariant to a pattern', function () { // eslint-disa
   });
 
   it('should match an unphased variant to a cis variant', function () {
-    debugger;
     const pattern = parse('NC0001_1.11:g.[123T>C](;)[345G>A]');
     const variant = parse('NC0001_1.11:g.[678A>T;345G>A;123T>C];[999=]');
 
