@@ -1,4 +1,6 @@
 import { matches } from './matcher';
+import { zeros } from 'mathjs'; // required by subgraph-isomorphism
+import { VariantGraph } from './variant-graph';
 
 export class SequenceVariant {
   constructor({ ac, type, variant }) {
@@ -11,24 +13,21 @@ export class SequenceVariant {
     return `${this.ac.toString()}:${this.type}.${this.variant.toString()}`;
   }
 
+  toGraph() {
+    return this.variant.toGraph();
+  }
+
   matches(pattern) {
-    return (
-      pattern instanceof SequenceVariant
-      && matches(this.ac, pattern.ac)
-      && matches(this.type, pattern.type)
-      && matches(this.variant, pattern.variant)
-    );
+    if (this.ac === pattern.ac && this.type === pattern.type) {
+      const vGraph = this.toGraph();
+      const pGraph = pattern.toGraph();
+      return vGraph.matches(pGraph);
+    }
+    return false;
   }
 }
 
 export class RelativeVariant {
-  _findMatchInsideOf() {
-    throw new Error('Method _findMatchInsideOf must be implemented on subclasses of RelativeVariant');
-  }
-
-  matches(pattern) {
-    return pattern._findMatchInsideOf(this);
-  }
 }
 
 export class UnphasedVariant extends RelativeVariant {
@@ -45,11 +44,13 @@ export class UnphasedVariant extends RelativeVariant {
     return this.variants.map(v => v.toString()).join('(;)');
   }
 
-  _findMatchInsideOf(other) {
-    if (other instanceof UnphasedVariant || other instanceof TransVariant || other instanceof CisVariant) {
-      return matchesSameClassVariant(this, other);
+  toGraph() {
+    // unphased variant adds patterns without specifying their connectivity
+    const graph = new VariantGraph([]);
+    for (const variant of this.variants) {
+      graph.add(variant.toGraph(), null); // disconnected subgraphs
     }
-    return false;
+    return graph;
   }
 }
 
@@ -67,8 +68,13 @@ export class TransVariant extends RelativeVariant {
     return this.variants.map(v=>v.toString()).join(';');
   }
 
-  _findMatchInsideOf(other) {
-    return other instanceof TransVariant && matchesSameClassVariant(this, other);
+  toGraph() {
+    // unphased variant adds patterns without specifying their connectivity
+    const graph = new VariantGraph([]);
+    for (const variant of this.variants) {
+      graph.add(variant.toGraph(), 'trans'); // disconnected subgraphs
+    }
+    return graph;
   }
 }
 
@@ -86,14 +92,9 @@ export class CisVariant extends RelativeVariant { // aka Allele
     return '[' + this.variants.map(v=>v.toString()).join(';') + ']';
   }
 
-  _findMatchInsideOf(other) {
-    if (other instanceof CisVariant) {
-      return matchesSameClassVariant(this, other);
-    } else if (other instanceof TransVariant) {
-      return matchesInternalVariant(this, other);
-    } else {
-      return false;
-    }
+  toGraph() {
+    // unphased variant adds patterns without specifying their connectivity
+    return new VariantGraph(this.variants, 'cis');
   }
 }
 
@@ -114,6 +115,10 @@ export class SimpleVariant {
     return `${pos.toString()}${edit.toString()}`;
   }
 
+  toGraph() {
+    return new VariantGraph([this]);
+  }
+
   matches(pattern) {
     return (
       pattern instanceof SimpleVariant
@@ -124,22 +129,49 @@ export class SimpleVariant {
   }
 }
 
-/**
- * If variant and patternVariant are the same class:
- */
-export function matchesSameClassVariant(patternVariant, variant) {
-  return !patternVariant.variants // either pattern has no variants to check
-    ||
-    patternVariant.variants.every( // or we can find a match for each subvariant in the pattern
-      pv => variant.variants.find(v => v.matches(pv))
-    );
-}
+// var depth = 0;
+// /**
+//  * If variant and patternVariant are the same class:
+//  */
+// export function matchesSameClassVariant(patternVariant, variant) {
+//   console.log(`${'\t'.repeat(depth)}attempting to match %s to pattern %s`, variant.toString(), patternVariant.toString());
+//   depth++;
+//   const indent = '\t'.repeat(depth);
 
-/**
- * If the variant could contain the pattern
- */
-export function matchesInternalVariant(patternVariant, variant) {
-  return variant.variants && variant.variants.some(
-    variant => variant.matches(patternVariant)
-  );
-}
+//   if (!patternVariant.variants) { // either pattern has no variants to check
+//     return true;
+//   } else {
+//     const variants = [...variant.variants];
+//     for (const pv of patternVariant.variants) {
+//       console.log('%schecking pattern subvariant %s', indent, pv.toString());
+//       const index = variants.findIndex(v => v.matches(pv));
+//       if (index === -1) {
+//         console.log('%sfailed', indent);
+//         return false;
+//       } else {
+//         console.log('%sremoving index %s (%s)', indent, index, variants[index].toString());
+//         variants.splice(index, 1);
+//       }
+//     }
+//     console.log('%ssuccess', indent);
+//     return true;
+//   }
+// }
+
+// /**
+//  * If the variant could contain the pattern
+//  */
+// export function matchesInternalVariant(patternVariant, variant) {
+//   return variant.variants && variant.variants.some(
+//     variant => variant.matches(patternVariant)
+//   );
+// }
+
+// function edgeListToMatrix(edges) {
+//   const maxLength = Math.max(...edges.map(([e1, e2]) => Math.max(e1, e2))) + 1;
+//   const matrix = zeros([maxLength, maxLength]);
+//   for (const [e1, e2] of edges) {
+//     matrix[e1][e2] = 1;
+//   }
+//   return matrix;
+// }

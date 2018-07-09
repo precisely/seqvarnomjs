@@ -5,10 +5,13 @@ export function sameClass(x, y) {
 }
 
 export function matches(obj, pattern) {
+  debugger;
   return (
     obj === pattern
     ||
-    (isString(obj) && isString(pattern) && obj.toLocaleLowerCase() === pattern.toLowerCase())
+    (!obj && !pattern) // both are falsy
+    ||
+    (isString(obj) && isString(pattern) && obj.toLowerCase() === pattern.toLowerCase())
     ||
     (obj && isFunction(obj.matches)
     &&
