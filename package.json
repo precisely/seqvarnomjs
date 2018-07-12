@@ -18,7 +18,7 @@
   "license": "UNLICENSED",
   "dependencies": {
     "lodash": "^4.17.5",
-    "mathjs": "^5.0.2",
+    "mathjs": "^3.20.2",
     "ometa-js": "^1.4.2",
     "subgraph-isomorphism": "^1.0.0"
   },

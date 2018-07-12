@@ -1060,10 +1060,6 @@ commander@^2.11.0:
   version "2.15.1"
   resolved "https://registry.yarnpkg.com/commander/-/commander-2.15.1.tgz#df46e867d0fc2aec66a34662b406a9ccafff5b0f"
 
-complex.js@2.0.11:
-  version "2.0.11"
-  resolved "https://registry.yarnpkg.com/complex.js/-/complex.js-2.0.11.tgz#09a873fbf15ffd8c18c9c2201ccef425c32b8bf1"
-
 complex.js@2.0.4:
   version "2.0.4"
   resolved "https://registry.yarnpkg.com/complex.js/-/complex.js-2.0.4.tgz#d8e7cfb9652d1e853e723386421c1a0ca7a48373"
@@ -1151,10 +1147,6 @@ debug@^3.0.1, debug@^3.1.0:
 decamelize@^1.0.0, decamelize@^1.1.1:
   version "1.2.0"
   resolved "https://registry.yarnpkg.com/decamelize/-/decamelize-1.2.0.tgz#f6534d15148269b20352e7bee26f501f9a191290"
-
-decimal.js@10.0.1:
-  version "10.0.1"
-  resolved "https://registry.yarnpkg.com/decimal.js/-/decimal.js-10.0.1.tgz#d04b16b277f0f9af09671cee225c4882e8857c58"
 
 decimal.js@9.0.1:
   version "9.0.1"
@@ -1265,7 +1257,7 @@ es-to-primitive@^1.1.1:
     is-date-object "^1.0.1"
     is-symbol "^1.0.1"
 
-escape-latex@1.1.0, escape-latex@^1.0.0:
+escape-latex@^1.0.0:
   version "1.1.0"
   resolved "https://registry.yarnpkg.com/escape-latex/-/escape-latex-1.1.0.tgz#c0a94a51eb8c73c3a67a95cc90fbb626cef54539"
 
@@ -1577,10 +1569,6 @@ form-data@~2.3.1:
 fraction.js@4.0.4:
   version "4.0.4"
   resolved "https://registry.yarnpkg.com/fraction.js/-/fraction.js-4.0.4.tgz#04e567110718adf7b52974a10434ab4c67a5183e"
-
-fraction.js@4.0.8:
-  version "4.0.8"
-  resolved "https://registry.yarnpkg.com/fraction.js/-/fraction.js-4.0.8.tgz#e53618112e3b36b348c61a81323173bceb01e418"
 
 fs-minipass@^1.2.5:
   version "1.2.5"
@@ -2613,7 +2601,7 @@ makeerror@1.0.x:
   dependencies:
     tmpl "1.0.x"
 
-mathjs@^3.16.3:
+mathjs@^3.16.3, mathjs@^3.20.2:
   version "3.20.2"
   resolved "https://registry.yarnpkg.com/mathjs/-/mathjs-3.20.2.tgz#3218aebde7de8cb5627c8fe3a1a216bf399ba91d"
   dependencies:
@@ -2625,19 +2613,6 @@ mathjs@^3.16.3:
     seed-random "2.2.0"
     tiny-emitter "2.0.2"
     typed-function "0.10.7"
-
-mathjs@^5.0.2:
-  version "5.0.2"
-  resolved "https://registry.yarnpkg.com/mathjs/-/mathjs-5.0.2.tgz#ed23dcfb40e886697447bcfe43e5dc5d92dd8eb0"
-  dependencies:
-    complex.js "2.0.11"
-    decimal.js "10.0.1"
-    escape-latex "1.1.0"
-    fraction.js "4.0.8"
-    javascript-natural-sort "0.7.1"
-    seed-random "2.2.0"
-    tiny-emitter "2.0.2"
-    typed-function "1.0.4"
 
 mem@^1.1.0:
   version "1.1.0"
@@ -3782,10 +3757,6 @@ type-check@~0.3.2:
 typed-function@0.10.7:
   version "0.10.7"
   resolved "https://registry.yarnpkg.com/typed-function/-/typed-function-0.10.7.tgz#f702af7d77a64b61abf86799ff2d74266ebc4477"
-
-typed-function@1.0.4:
-  version "1.0.4"
-  resolved "https://registry.yarnpkg.com/typed-function/-/typed-function-1.0.4.tgz#6b25993b8587b0a5c3356585d6ef99aa63f6d317"
 
 typedarray@^0.0.6:
   version "0.0.6"
