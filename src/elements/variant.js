@@ -24,17 +24,35 @@ export class SequenceVariant {
     }
     return false;
   }
+
+  listSimpleVariants() {
+    return this.variant.listSimpleVariants();
+  }
 }
 
 export class RelativeVariant {
-}
-
-export class UnphasedVariant extends RelativeVariant {
   constructor({ variants }) {
     super();
     this.variants = variants;
   }
 
+  listSimpleVariants() {
+    if (variants) {
+      let result = [];
+      for (const variant of variants) {
+        if (variant instanceof SimpleVariant) {
+          result.push(variant);
+        } else {
+          result = [result, ...variant.listSimpleVariants()];
+        }
+      }
+    } else {
+      return [];
+    }
+  }
+}
+
+export class UnphasedVariant extends RelativeVariant {
   get type() {
     return 'unphased';
   }
@@ -54,11 +72,6 @@ export class UnphasedVariant extends RelativeVariant {
 }
 
 export class TransVariant extends RelativeVariant {
-  constructor({ variants }) {
-    super();
-    this.variants = variants;
-  }
-
   get type() {
     return 'trans';
   }
@@ -78,11 +91,6 @@ export class TransVariant extends RelativeVariant {
 }
 
 export class CisVariant extends RelativeVariant { // aka Allele
-  constructor({ variants }) {
-    super();
-    this.variants = variants;
-  }
-
   get type() {
     return 'cis';
   }
