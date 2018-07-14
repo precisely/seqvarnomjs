@@ -32,7 +32,6 @@ export class SequenceVariant {
 
 export class RelativeVariant {
   constructor({ variants }) {
-    super();
     this.variants = variants;
   }
 
