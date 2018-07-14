@@ -36,15 +36,16 @@ export class RelativeVariant {
   }
 
   listSimpleVariants() {
-    if (variants) {
+    if (this.variants) {
       let result = [];
-      for (const variant of variants) {
+      for (const variant of this.variants) {
         if (variant instanceof SimpleVariant) {
           result.push(variant);
         } else {
-          result = [result, ...variant.listSimpleVariants()];
+          result = [... result, ...variant.listSimpleVariants()];
         }
       }
+      return result;
     } else {
       return [];
     }

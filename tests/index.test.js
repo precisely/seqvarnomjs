@@ -1,5 +1,5 @@
 import { parse } from '../src/';
-import { SequenceVariant, NARefAlt } from '../src/elements';
+import { SequenceVariant, NARefAlt, SimpleVariant } from '../src/elements';
 
 describe('parsing', function () {
   it('should return a SequenceVariant object when given a string', function () {
@@ -170,4 +170,22 @@ describe('matching a SequenceVariant to a pattern', function () { // eslint-disa
     expect(variant.matches(pattern)).toBeFalsy();
   });
 
+  describe('listSimpleVariants', function () {
+    it('when provided a single variant, should return a single simple variant', function () {
+      const simpleVariants = parse('NC0001_1.11:g.[123A>T]').listSimpleVariants();
+      expect(simpleVariants).toHaveLength(1);
+      expect(simpleVariants[0]).toBeInstanceOf(SimpleVariant);
+      expect(simpleVariants[0].pos).toEqual(123);
+    });
+
+    it('should return a multiple variants in trans, unphased and cis', function () {
+      const result = parse('NC0001_1.11:g.[1A>T;2=;3G>C];[4A>G;5T>C](;)[6C>A;7=](;)[8=]');
+      const simpleVariants = result.listSimpleVariants();
+      expect(simpleVariants).toHaveLength(8);
+      simpleVariants.forEach(v => expect(v).toBeInstanceOf(SimpleVariant));
+      const positions = simpleVariants.map(v => v.pos);
+      positions.sort();
+      expect(positions).toEqual([1,2,3,4,5,6,7,8]);
+    });
+  });
 });
