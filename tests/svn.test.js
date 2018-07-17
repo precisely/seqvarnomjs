@@ -23,6 +23,23 @@ describe('svn.ometa', function () {
     expect(result.variant.pos.value).toEqual(123123);
   });
 
+  it('should read a cis variant with a custom accession', function () {
+    const result = SVN.matchAll('chr1:g.[123A>T]', 'svnVariant');
+    expect(result).toBeInstanceOf(SequenceVariant);
+    expect(result.ac).toBe('chr1');
+  });
+
+  it('should read a single cis variant', function () {
+    const result = SVN.matchAll('NC00001_1.11:g.[123A>T]', 'svnVariant');
+    expect(result.variant).toBeInstanceOf(CisVariant);
+    expect(result.variant.variants).toHaveLength(1);
+    const simpleVariant = result.variant.variants[0];
+    expect(simpleVariant).toBeInstanceOf(SimpleVariant);
+    expect(simpleVariant.pos).toEqual(123);
+    expect(simpleVariant.edit.ref).toEqual('A');
+    expect(simpleVariant.edit.alt).toEqual('T');
+  });
+
   it('should read a wild-type variant', function () {
     const result = SVN.matchAll('NC00001_1.11:g.123123=', 'svnVariant');
     expect(result).toBeInstanceOf(SequenceVariant);
