@@ -1,7 +1,7 @@
 {
   "name": "seqvarnomjs",
   "private": true,
-  "version": "1.1.6",
+  "version": "1.1.7",
   "description": "",
   "main": "lib/index.js",
   "files": [
@@ -18,9 +18,12 @@
   "license": "UNLICENSED",
   "dependencies": {
     "lodash": "^4.17.5",
-    "mathjs": "^3.20.2",
+    "mathjs": "^3.16.3",
     "ometa-js": "^1.4.2",
     "subgraph-isomorphism": "^1.0.0"
+  },
+  "resolutions": {
+    "mathjs": "3.16.3"
   },
   "devDependencies": {
     "babel-cli": "^6.26.0",
