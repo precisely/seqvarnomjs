@@ -55,5 +55,8 @@
       "json",
       "node"
     ]
+  },
+  "config": {
+    "unsafe-perm":true
   }
 }
