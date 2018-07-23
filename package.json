@@ -9,9 +9,9 @@
   ],
   "scripts": {
     "console": "babel-node",
-    "test": "yarn build && jest",
+    "test": "npm run build && jest",
     "build": "rm -f src/svn.js && ometajs2js -i src/svn.ometa -o src/svn.js",
-    "prepare": "rm -frd lib && mkdir lib && yarn build && babel src -d lib && cp src/index.d.ts lib/",
+    "prepare": "rm -frd lib && mkdir lib && npm run build && babel src -d lib && cp src/index.d.ts lib/",
     "lint": "eslint src/**/*.js test/**/*.js"
   },
   "author": "",
