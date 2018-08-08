@@ -17,6 +17,18 @@ describe('svn.ometa', function () {
     expect(result.variant.edit.alt).toEqual('C');
   });
 
+  it('should read a nucleic acid variant with alternate accession type', function () {
+    const result = SVN.matchAll('chr1.37p13:g.123123T>C', 'svnVariant');
+    expect(result).toBeInstanceOf(SequenceVariant);
+    expect(result.ac).toEqual('chr1.37p13');
+    expect(result.type).toEqual('g');
+    expect(result.variant).toBeInstanceOf(SimpleVariant);
+    expect(result.variant.pos).toEqual(123123);
+    expect(result.variant.edit).toBeInstanceOf(NARefAlt);
+    expect(result.variant.edit.ref).toEqual('T');
+    expect(result.variant.edit.alt).toEqual('C');
+  });
+
   it('should read a simple variant with uncertain position', function () {
     const result = SVN.matchAll('NC00001_1.11:g.(123123)T>C', 'svnVariant');
     expect(result.variant.pos).toBeInstanceOf(Uncertain);

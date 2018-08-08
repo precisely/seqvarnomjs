@@ -249,7 +249,7 @@ ometa SVN {
   letterOrDigit = <letter> | <digit>,
 
   // Accessions, possibly versioned. Should accept, e.g., NM_01234.5, LRG_01234_1p1
- accn = <letter letterOrDigit+ ('_' letterOrDigit+)? ('.' digit+)?>
+  accn = <letter letterOrDigit+ ('_' letterOrDigit+)? ('.' letterOrDigit+)?>
 }
 
 module.exports = {
