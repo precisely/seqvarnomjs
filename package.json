@@ -1,7 +1,7 @@
 {
   "name": "seqvarnomjs",
   "private": true,
-  "version": "1.1.8",
+  "version": "1.2.0",
   "description": "",
   "main": "lib/index.js",
   "files": [
@@ -10,7 +10,7 @@
   "scripts": {
     "console": "babel-node",
     "test": "yarn build && jest",
-    "build": "rm -f src/svn.js && ometajs2js -i src/svn.ometa -o src/svn.js",
+    "build": "rm -f src/svn.js && ometajs2js -b -i src/svn.ometa -o src/svn.js",
     "prepare": "rm -frd lib && mkdir lib && yarn build && babel src -d lib && cp src/index.d.ts lib/",
     "lint": "eslint src/**/*.js test/**/*.js"
   },
@@ -19,7 +19,7 @@
   "dependencies": {
     "lodash": "^4.17.5",
     "mathjs": "^3.16.3",
-    "ometa-js": "^1.4.2",
+    "ometa-js": "git+ssh://git@github.com:aneilbaboo/ometa-js.git#1.5.2-webpackOptions",
     "subgraph-isomorphism": "^1.0.0"
   },
   "resolutions": {
