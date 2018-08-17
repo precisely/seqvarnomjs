@@ -2854,9 +2854,9 @@ object.omit@^2.0.0:
     for-own "^0.1.4"
     is-extendable "^0.1.1"
 
-"ometa-js@git+ssh://git@github.com:aneilbaboo/ometa-js.git#1.5.2-webpackOptions":
-  version "1.5.2"
-  resolved "git+ssh://git@github.com:aneilbaboo/ometa-js.git#d1c3bed7882bafe299550c3a11579f04b0fdd750"
+ometa-js@^1.5.3:
+  version "1.5.3"
+  resolved "https://registry.yarnpkg.com/ometa-js/-/ometa-js-1.5.3.tgz#efa844446807cf3fe006f09c14173b3b1192d681"
   dependencies:
     coa "~0.3.9"
     colors "^1.2.4"
