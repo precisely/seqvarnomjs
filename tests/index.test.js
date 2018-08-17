@@ -1,5 +1,5 @@
 import { parse } from '../src/';
-import { SequenceVariant, NARefAlt, SimpleVariant } from '../src/elements';
+import { SequenceVariant, SimpleVariant } from '../src/elements';
 
 describe('parsing', function () {
   it('should return a SequenceVariant object when given a string', function () {
