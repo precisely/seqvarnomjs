@@ -3,5 +3,13 @@ export * from './elements';
 export * from './constants';
 
 export function parse(s) {
-  return SVN.matchAll(s, 'svnVariant');
+  try {
+    return SVN.matchAll(s, 'svnVariant');
+  } catch (e) {
+    if (e.message === 'SyntaxError: match failed') {
+      throw new Error(`Bad input: ${s}`);
+    } else {
+      throw new Error(`Bad input: ${s} - ${e.message}`);
+    }
+  }
 }

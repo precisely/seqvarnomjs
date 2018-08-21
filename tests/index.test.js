@@ -188,4 +188,8 @@ describe('matching a SequenceVariant to a pattern', function () { // eslint-disa
       expect(positions).toEqual([1,2,3,4,5,6,7,8]);
     });
   });
+
+  it('should throw an error on bad input', function () {
+    expect(() => parse('foo')).toThrow('Bad input: foo');
+  });
 });
