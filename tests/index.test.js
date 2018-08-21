@@ -1,5 +1,5 @@
 import { parse } from '../src/';
-import { SequenceVariant, NARefAlt, SimpleVariant } from '../src/elements';
+import { SequenceVariant, SimpleVariant } from '../src/elements';
 
 describe('parsing', function () {
   it('should return a SequenceVariant object when given a string', function () {
@@ -187,5 +187,9 @@ describe('matching a SequenceVariant to a pattern', function () { // eslint-disa
       positions.sort();
       expect(positions).toEqual([1,2,3,4,5,6,7,8]);
     });
+  });
+
+  it('should throw an error on bad input', function () {
+    expect(() => parse('foo')).toThrow('Bad input: foo');
   });
 });
