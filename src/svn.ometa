@@ -36,7 +36,7 @@ ometa SVN {
 
   cSeqVariant = accn:ac ':' 'c':type '.' (cUnphasedVariant | cTransVariant | cCisVariant | cSimpleVariant):variant
               -> new SequenceVariant({ac:ac, type:type, variant:variant}),
-  gSeqVariant = accn:ac ':' 'g':type '.' (gUnphasedVariant | gTransVariant | gCisVariant | gSimpleVariant):variant
+  gSeqVariant = accn:ac ':' 'g':type '.' (gUnphasedVariant | gTransVariant | gCisVariant | gSimpleVariant | gLocation):variant
               -> new SequenceVariant({ac:ac, type:type, variant:variant}),
   mSeqVariant = accn:ac ':' 'm':type '.' mSimpleVariant:variant -> new SequenceVariant({ac:ac, type:type, variant:variant}),
   nSeqVariant = accn:ac ':' 'n':type '.' nSimpleVariant:variant -> new SequenceVariant({ac:ac, type:type, variant:variant}),
@@ -101,7 +101,8 @@ ometa SVN {
   // SimpleVariant a single position with an optional edit (ref=>alt change)
   //               simple variant with a null edit indicates the reference sequence was found
   cSimpleVariant = cInterval:pos dnaEdit:edit -> new SimpleVariant({pos:pos,edit:edit}),
-  gSimpleVariant = gInterval:pos dnaEdit:edit -> new SimpleVariant({pos:pos,edit:edit}),
+  gSimpleVariant = gInterval:pos dnaEdit:edit -> new SimpleVariant({pos:pos,edit:edit})
+                |  gInterval:pos -> new SimpleVariant({pos:pos,edit:null}),
   mSimpleVariant = mInterval:pos dnaEdit:edit -> new SimpleVariant({pos:pos,edit:edit}),
   nSimpleVariant = nInterval:pos dnaEdit:edit -> new SimpleVariant({pos:pos,edit:edit}),
   rSimpleVariant = (rInterval:pos rnaEdit:edit -> new SimpleVariant({pos:pos,edit:edit}))
@@ -126,7 +127,7 @@ ometa SVN {
 
   dnaEditMU = dnaEdit | '(' dnaEdit:edit ')' -> edit.setUncertain(),
   dnaEdit   = dnaIdent | dnaSubst | dnaDelins | dnaIns | dnaDel | dnaDup | dnaInv | dnaCon | dnaCopy,
-  dnaIdent  = <dna*>:ref '='           -> null,
+  dnaIdent  = <dna*>:ref '='           -> '=',
   dnaSubst  = dna:ref '>' dna:alt      -> new NARefAlt({ref:ref,alt:alt}),
   dnaDelins = 'del' (<num>|<dna*>):ref 'ins' <dna+>:alt  -> null,
   dnaDel    = 'del' (<num>|<dna*>):ref -> new NARefAlt({ref:ref,alt:null}),

@@ -126,12 +126,14 @@ export class SimpleVariant {
     return new VariantGraph([this]);
   }
 
+  // matches Location and SimpleVariant objects
   matches(pattern) {
-    return (
-      pattern instanceof SimpleVariant
-      && matches(this.pos, pattern.pos)
-      && matches(this.edit, pattern.edit)
-      && matches(this.uncertain, pattern.uncertain)
-    );
+    const locationMatch = pattern instanceof SimpleVariant && matches(this.pos, pattern.pos);
+    const editMatch = pattern.edit
+      ? matches(this.edit, pattern.edit) && matches(this.uncertain, pattern.uncertain)
+      : true;
+
+    return locationMatch && editMatch;
   }
 }
+
