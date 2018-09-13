@@ -1,7 +1,7 @@
 import { SVN } from 'src/svn';
 import {
   SequenceVariant, TransVariant, NARefAlt, Uncertain,
-  UnphasedVariant, CisVariant, SimpleVariant
+  UnphasedVariant, CisVariant, SimpleVariant, Location
 } from 'src/elements';
 
 describe('svn.ometa', function () {
@@ -15,6 +15,15 @@ describe('svn.ometa', function () {
     expect(result.variant.edit).toBeInstanceOf(NARefAlt);
     expect(result.variant.edit.ref).toEqual('T');
     expect(result.variant.edit.alt).toEqual('C');
+  });
+
+  it('should read a location', function () {
+    const result = SVN.matchAll('NC00001_1.11:g.123123', 'svnVariant');
+    expect(result).toBeInstanceOf(SequenceVariant);
+    expect(result.ac).toEqual('NC00001_1.11');
+    expect(result.type).toEqual('g');
+    expect(result.variant).toBeInstanceOf(SimpleVariant);
+    expect(result.variant.edit).toBeNull();
   });
 
   it('should read a nucleic acid variant with alternate accession type', function () {
@@ -59,7 +68,7 @@ describe('svn.ometa', function () {
     expect(result.type).toEqual('g');
     expect(result.variant).toBeInstanceOf(SimpleVariant);
     expect(result.variant.pos).toEqual(123123);
-    expect(result.variant.edit).toBeNull();
+    expect(result.variant.edit).toEqual('=');
   });
 
   context('when provided with a representation of a trans variant', function() {
@@ -92,7 +101,7 @@ describe('svn.ometa', function () {
 
         expect(simpleVariant2).toBeInstanceOf(SimpleVariant);
         expect(simpleVariant2.pos).toEqual(123123);
-        expect(simpleVariant2.edit).toBeNull();
+        expect(simpleVariant2.edit).toEqual('=');
       });
     });
 
@@ -105,9 +114,9 @@ describe('svn.ometa', function () {
       const variant1 = cisVariant1.variants[0];
       const variant2 = cisVariant2.variants[0];
       expect(variant1.pos).toEqual(123123);
-      expect(variant1.edit).toBeNull();
+      expect(variant1.edit).toEqual('=');
       expect(variant2.pos).toEqual(123123);
-      expect(variant2.edit).toBeNull();
+      expect(variant2.edit).toEqual('=');
     });
 
     it('should read a tri-allelic variant as a TransVariant type', function () {

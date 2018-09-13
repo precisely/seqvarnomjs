@@ -1,5 +1,6 @@
 import { parse } from '../src/';
 import { SequenceVariant, SimpleVariant } from '../src/elements';
+const cases = require('jest-in-case');
 
 describe('parsing', function () {
   it('should return a SequenceVariant object when given a string', function () {
@@ -35,6 +36,23 @@ describe('matching a SequenceVariant to a pattern', function () { // eslint-disa
     const variant = parse('NC0001_1.11:g.123=');
     expect(variant.matches(pattern)).toBeTruthy();
   });
+
+  cases('should match locations', function ([patternStr, variantStr, shouldMatch]) {
+    debugger;
+    const pattern = parse(patternStr);
+    const variant = parse(variantStr);
+    if (shouldMatch) {
+      expect(variant.matches(pattern)).toBeTruthy();
+    } else {
+      expect(variant.matches(pattern)).toBeFalsy();
+    }
+  }, [
+    ['NC0001_1.11:g.123', 'NC0001_1.11:g.123=', true],
+    ['NC0001_1.11:g.123', 'NC0001_1.11:g.[123=];[123A>T]', true],
+    ['NC0001_1.11:g.123', 'NC0001_1.11:g.[123=](;)[123A>T]', true],
+    ['NC0001_1.11:g.999', 'NC0001_1.11:g.123=', false],
+    ['NC0001_1.11:g.999', 'NC0001_1.11:g.[123=](;)[123A>T]', false],
+  ]);
 
   it('should not match a wild type to an edit', function () {
     const pattern = parse('NC0001_1.11:g.123=');
