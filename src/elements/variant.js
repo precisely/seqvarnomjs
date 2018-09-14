@@ -135,5 +135,9 @@ export class SimpleVariant {
 
     return locationMatch && editMatch;
   }
+
+  listSimpleVariants() {
+    return [this];
+  }
 }
 
