@@ -210,4 +210,20 @@ describe('matching a SequenceVariant to a pattern', function () { // eslint-disa
   it('should throw an error on bad input', function () {
     expect(() => parse('foo')).toThrow('Bad input: foo');
   });
+
+
+  describe('SequenceVariant', function () {
+    cases('should listSimpleVariants', function ([input, ...output]) {
+      const seqVar = parse(input);
+      expect(seqVar).toBeDefined();
+      const simpleVariants = seqVar.listSimpleVariants();
+      expect(simpleVariants).toHaveLength(output.length);
+      expect(simpleVariants.map(sv => sv.toString())).toEqual(output);
+    }, [
+      ['NC_000001.11:g.1', '1'],
+      ['NC_000001.11:g.1=', '1='],
+      ['NC_000001.11:g.[1=];[2=]', '1=', '2='],
+      ['NC_000001.11:g.[1=];[2=](;)[3G>C]', '1=', '2=','3G>C']
+    ]);
+  });
 });

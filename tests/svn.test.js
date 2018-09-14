@@ -273,6 +273,11 @@ describe('svn.ometa', function () {
 });
 
 describe('toString', function () {
+  it('should stringify a location only simple variant', function () {
+    const result = SVN.matchAll('NC00001_1.11:g.123123', 'svnVariant');
+    expect(result.toString()).toEqual('NC00001_1.11:g.123123');
+  });
+
   it('should stringify a simple nucleic acid variant', function () {
     const result = SVN.matchAll('NC00001_1.11:g.123123T>C', 'svnVariant');
     expect(result.toString()).toEqual('NC00001_1.11:g.123123T>C');
