@@ -117,7 +117,7 @@ export class SimpleVariant {
   }
 
   toString() {
-    const edit = this.edit || '=';
+    const edit = this.edit || '';
     const pos = this.pos || 'error';
     return `${pos.toString()}${edit.toString()}`;
   }
