@@ -1,7 +1,7 @@
 import { SVN } from 'src/svn';
 import {
   SequenceVariant, TransVariant, NARefAlt, Uncertain,
-  UnphasedVariant, CisVariant, SimpleVariant, Location
+  UnphasedVariant, CisVariant, SimpleVariant
 } from 'src/elements';
 
 describe('svn.ometa', function () {
@@ -15,6 +15,30 @@ describe('svn.ometa', function () {
     expect(result.variant.edit).toBeInstanceOf(NARefAlt);
     expect(result.variant.edit.ref).toEqual('T');
     expect(result.variant.edit.alt).toEqual('C');
+  });
+
+  it('should read substitution representing a nucleic acid insertion variant', function () {
+    const result = SVN.matchAll('NC00001_1.11:g.123123T>TC', 'svnVariant');
+    expect(result).toBeInstanceOf(SequenceVariant);
+    expect(result.ac).toEqual('NC00001_1.11');
+    expect(result.type).toEqual('g');
+    expect(result.variant).toBeInstanceOf(SimpleVariant);
+    expect(result.variant.pos).toEqual(123123);
+    expect(result.variant.edit).toBeInstanceOf(NARefAlt);
+    expect(result.variant.edit.ref).toEqual('T');
+    expect(result.variant.edit.alt).toEqual('TC');
+  });
+
+  it('should read substitution representing a nucleic acid deletion variant', function () {
+    const result = SVN.matchAll('NC00001_1.11:g.123123TC>T', 'svnVariant');
+    expect(result).toBeInstanceOf(SequenceVariant);
+    expect(result.ac).toEqual('NC00001_1.11');
+    expect(result.type).toEqual('g');
+    expect(result.variant).toBeInstanceOf(SimpleVariant);
+    expect(result.variant.pos).toEqual(123123);
+    expect(result.variant.edit).toBeInstanceOf(NARefAlt);
+    expect(result.variant.edit.ref).toEqual('TC');
+    expect(result.variant.edit.alt).toEqual('T');
   });
 
   it('should read a location', function () {

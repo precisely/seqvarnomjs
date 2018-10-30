@@ -128,7 +128,7 @@ ometa SVN {
   dnaEditMU = dnaEdit | '(' dnaEdit:edit ')' -> edit.setUncertain(),
   dnaEdit   = dnaIdent | dnaSubst | dnaDelins | dnaIns | dnaDel | dnaDup | dnaInv | dnaCon | dnaCopy,
   dnaIdent  = <dna*>:ref '='           -> '=',
-  dnaSubst  = dna:ref '>' dna:alt      -> new NARefAlt({ref:ref,alt:alt}),
+  dnaSubst  = dnaSeq:ref '>' dnaSeq:alt      -> new NARefAlt({ref:ref,alt:alt}),
   dnaDelins = 'del' (<num>|<dna*>):ref 'ins' <dna+>:alt  -> null,
   dnaDel    = 'del' (<num>|<dna*>):ref -> new NARefAlt({ref:ref,alt:null}),
   dnaIns    = 'ins' <dna+>:alt         -> new NARefAlt({ref:null,alt:ref}),
