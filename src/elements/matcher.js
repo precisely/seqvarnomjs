@@ -4,6 +4,11 @@ export function sameClass(x, y) {
   return x===y || (x && x.prototype && x.prototype) === (y && y.prototype && y.prototype);
 }
 
+/**
+ * Checks whether the object (left param) contains the pattern (right param)
+ * @param {*} obj 
+ * @param {*} pattern 
+ */
 export function matches(obj, pattern) {
   return (
     obj === pattern

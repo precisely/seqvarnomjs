@@ -16,6 +16,11 @@ export class SequenceVariant {
     return this.variant.toGraph();
   }
 
+  /**
+   * True when the current SequenceVariant object matches the provided pattern 
+   * (which must be another SequenceVariant object)
+   * @param {*} pattern 
+   */
   matches(pattern) {
     if (this.ac === pattern.ac && this.type === pattern.type) {
       const vGraph = this.toGraph();
